@@ -5,34 +5,49 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
-    tools:context=".ui.activity.MainActivity">
+    tools:context=".ui.activity.TransactionsActivity">
 
     <TextView
-        android:id="@+id/shopName"
+        android:id="@+id/t1"
         android:textColor="@color/colorSecondary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
-        android:text="Raju Bhai Kiranewala"
+        android:text="Transactions"
         android:textSize="42sp"
         android:textStyle="bold" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_below="@+id/shopName"
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
+        android:layout_margin="20dp"
+        android:layout_below="@id/t1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:listitem="@layout/item_customer"/>
+        android:layout_gravity="top"
+        app:tabSelectedTextColor="@color/colorSecondary"
+        app:tabBackground="@color/colorPrimaryDark"
+        app:tabIndicatorColor="@color/colorSecondary"
+        app:tabTextAppearance="@style/CustomPrefixStyle"
+        app:tabMode="fixed"
+        app:tabPadding="10dp"
+        />
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewpager"
+        android:layout_below="@id/tabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/addCustomer"
+        android:id="@+id/addTransaction"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="15dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         app:elevation="10dp"
-        android:src="@drawable/ic_baseline_customer_add_24"/>
+        android:src="@drawable/ic_baseline_add_24"/>
+
 </RelativeLayout>

@@ -15,8 +15,11 @@ import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.*
 import com.raghav.digitalpaymentsbook.data.network.RetrofitHelper
 import com.raghav.digitalpaymentsbook.databinding.ActivityLoginBinding
+import com.raghav.digitalpaymentsbook.ui.dialog.ChooseRoleDialog
 import com.raghav.digitalpaymentsbook.ui.dialog.LoadingDialog
+import com.raghav.digitalpaymentsbook.util.Constants
 import com.raghav.digitalpaymentsbook.util.NetworkUtils
+import com.raghav.digitalpaymentsbook.util.add
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import okhttp3.MediaType
@@ -155,43 +158,66 @@ class LoginActivity : AppCompatActivity() {
                         Log.d("TAG", "ERROR- ${throwable.message}")
                     }
 
-                    if (NetworkUtils.isInternetAvailable(this)) {
+                    //testing
+                    dialog.dismiss()
+                    val roleDialog = ChooseRoleDialog()
+                    roleDialog.show(supportFragmentManager,"roleDialog")
+                    roleDialog.isCancelable=false
 
-                        lifecycleScope.launch(handler) {
 
-//                            val result = RetrofitHelper.userAPI.addUser(map)
-//                            if (result.isSuccessful && result.body() != null) {
-//                                dialog.dismiss()
-//                                val sharedPref =
-//                                    getSharedPreferences("bookvender", Context.MODE_PRIVATE)
-//                                with(sharedPref.edit()) {
+//                    if (NetworkUtils.isInternetAvailable(this)) {
 //
-//                                    putInt("user_id", result.body()!!.user_id)
-//                                    putLong("phone", result.body()!!.phone)
-//                                    putString("name", result.body()!!.name)
-//                                    apply()
+//                        lifecycleScope.launch(handler) {
+//
+//                            if (user != null && user.phoneNumber != null) {
+//
+//                                val resCus = RetrofitHelper.userAPI.isCustomer(user.phoneNumber!!.substring(1))
+//                                val resRet = RetrofitHelper.userAPI.isRetailer(user.phoneNumber!!.substring(1))
+//
+//                                //user already has an account as customer
+//                                if(resCus.isSuccessful && resCus.body()!=null){
+//                                    dialog.dismiss()
+//                                    val sharedPref =
+//                                        getSharedPreferences(Constants.SHARED_PREF_NAME, Context.MODE_PRIVATE)
+//                                    sharedPref.add(resCus.body()!!)
+//
+//                                    startActivity(
+//                                        Intent(
+//                                            this@LoginActivity,
+//                                            MainActivity::class.java
+//                                        )
+//                                    )
+//                                //user already has an account as retailer
+//                                }else if(resRet.isSuccessful && resRet.body()!=null){
+//                                    dialog.dismiss()
+//                                    val sharedPref =
+//                                        getSharedPreferences(Constants.SHARED_PREF_NAME, Context.MODE_PRIVATE)
+//                                    sharedPref.add(resRet.body()!!)
+//
+//                                    startActivity(
+//                                        Intent(
+//                                            this@LoginActivity,
+//                                            MainActivity::class.java
+//                                        )
+//                                    )
+//                                //user doesn't have an account, create new
+//                                }else{
+//                                    dialog.dismiss()
+//                                    val roleDialog = ChooseRoleDialog()
+//                                    roleDialog.show(supportFragmentManager,"roleDialog")
+//                                    roleDialog.isCancelable=false
 //                                }
-//
-//                                startActivity(Intent(this@LoginActivity, MainActivity::class.java))
-//                            } else {
-//                                dialog.dismiss()
-//                                Toast.makeText(
-//                                    this@LoginActivity,
-//                                    "Server error",
-//                                    Toast.LENGTH_SHORT
-//                                ).show()
 //                            }
-
-                        }
-                    } else {
-
-                        dialog.dismiss()
-                        Toast.makeText(
-                            this@LoginActivity,
-                            "Please make sure you have internet access",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+//                        }
+//                    } else {
+//
+//                        dialog.dismiss()
+//                        Toast.makeText(
+//                            this@LoginActivity,
+//                            "Please make sure you have internet access",
+//                            Toast.LENGTH_SHORT
+//                        ).show()
+//                    }
 
                 } else {
                     dialog.dismiss()

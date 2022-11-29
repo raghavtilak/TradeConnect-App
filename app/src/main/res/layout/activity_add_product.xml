@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <TextView
+        android:id="@+id/t11"
+        android:textColor="@color/colorSecondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="Add"
+        android:textSize="42sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/t22"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/t11"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
+        android:text="products"
+        android:textColor="@color/black"
+        android:textSize="42sp"
+        android:textStyle="bold" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/productCard"
+        android:layout_below="@id/t22"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="8dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/TextFieldProduct"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Product name"
+            app:boxBackgroundColor="@color/white"
+            app:boxStrokeColor="@color/colorPrimaryDark"
+            app:hintAnimationEnabled="false"
+            app:hintTextColor="@color/colorPrimaryDark"
+            app:prefixText="+91"
+            app:prefixTextAppearance="@style/CustomPrefixStyle">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextProduct"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:imeOptions="actionSearch"
+                android:inputType="phone"
+                android:lines="1"
+                android:maxLength="10"
+                android:maxLines="1"
+                android:textSize="18sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <LinearLayout
+        android:id="@+id/priceContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/productCard"
+        android:orientation="horizontal">
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="5dp"
+            android:layout_weight="1"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="8dp">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/TextFieldProductPrice"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Product Price"
+                app:boxBackgroundColor="@color/white"
+                app:boxStrokeColor="@color/colorPrimaryDark"
+                app:hintAnimationEnabled="false"
+                app:hintTextColor="@color/colorPrimaryDark"
+                app:prefixText="₹"
+                app:prefixTextAppearance="@style/CustomPrefixStyle">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextProductPrice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:imeOptions="actionSearch"
+                    android:inputType="number"
+                    android:lines="1"
+                    android:maxLength="5"
+                    android:maxLines="1"
+                    android:textSize="18sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="20dp"
+            android:layout_weight="1"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="8dp">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/TextFieldPaid"
+                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Paid"
+                app:boxBackgroundColor="@color/white"
+                app:boxStrokeColor="@color/colorPrimaryDark"
+                app:hintAnimationEnabled="false"
+                app:hintTextColor="@color/colorPrimaryDark"
+                app:prefixText="₹"
+                app:prefixTextAppearance="@style/CustomPrefixStyle">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextPaid"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:imeOptions="actionSearch"
+                    android:inputType="number"
+                    android:lines="1"
+                    android:maxLength="5"
+                    android:maxLines="1"
+                    android:textSize="18sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addProduct"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/priceContainer"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:src="@drawable/ic_baseline_arrow_downward_24" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerview"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="10dp"
+        tools:listitem="@layout/item_product"
+        android:layout_below="@+id/addProduct"
+        android:layout_above="@id/line"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <View
+        android:id="@+id/line"
+        android:layout_above="@id/t2"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:background="#515151"/>
+    <TextView
+        android:id="@+id/t2"
+        android:padding="5dp"
+        android:layout_toStartOf="@id/totalAmount"
+        android:layout_above="@id/t3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textColor="@color/white"
+        android:text="Total Amount: "/>
+    <TextView
+        android:id="@+id/totalAmount"
+        android:padding="5dp"
+        android:layout_alignParentEnd="true"
+        android:layout_above="@id/t3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textColor="@color/white"
+        android:text="400"/>
+
+    <TextView
+        android:id="@+id/t3"
+        android:padding="5dp"
+        android:layout_toStartOf="@id/userPaid"
+        android:layout_above="@id/t4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textColor="@color/white"
+        android:text="User Paid: "/>
+    <TextView
+        android:id="@+id/userPaid"
+        android:padding="5dp"
+        android:layout_alignParentEnd="true"
+        android:layout_above="@id/t4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textColor="@color/green"
+        android:text="200"/>
+
+    <TextView
+        android:id="@+id/t4"
+        android:padding="5dp"
+        android:layout_toStartOf="@id/dueAmount"
+        android:layout_above="@id/addTransaction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textColor="@color/white"
+        android:text="Due: "/>
+    <TextView
+        android:id="@+id/dueAmount"
+        android:padding="5dp"
+        android:layout_alignParentEnd="true"
+        android:layout_above="@id/addTransaction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textColor="@color/red"
+        android:text="200"/>
+
+    <TextView
+        android:id="@+id/addTransaction"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorSecondary"
+        android:text="Add Transaction"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:padding="10dp"
+        android:layout_alignParentBottom="true"
+        android:textAlignment="center"
+        android:textSize="22sp"/>
+</RelativeLayout>

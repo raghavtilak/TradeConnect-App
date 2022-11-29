@@ -9,19 +9,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import com.raghav.digitalpaymentsbook.databinding.LayoutLoadingDialogBinding
+import com.raghav.digitalpaymentsbook.databinding.DialogLoadingBinding
 
 class LoadingDialog : DialogFragment() {
 
-    var _binding: LayoutLoadingDialogBinding? =null
-    val binding : LayoutLoadingDialogBinding
+    private var _binding: DialogLoadingBinding? =null
+    private val binding : DialogLoadingBinding
         get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        _binding= LayoutLoadingDialogBinding.inflate(layoutInflater)
+        _binding= DialogLoadingBinding.inflate(layoutInflater)
         return binding.root
     }
 
