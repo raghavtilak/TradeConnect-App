@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
@@ -18,6 +19,7 @@ import com.raghav.digitalpaymentsbook.databinding.ActivityCreateUserBinding
 import com.raghav.digitalpaymentsbook.ui.dialog.LoadingDialog
 import com.raghav.digitalpaymentsbook.util.Constants
 import com.raghav.digitalpaymentsbook.util.add
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 
 class CreateUserActivity : AppCompatActivity() {
@@ -55,9 +57,15 @@ class CreateUserActivity : AppCompatActivity() {
                 val password = user?.uid
                 val phone = user?.phoneNumber?.substring(1)
                 val c = Customer(name,password!!,phone!!,address )
-                
-                lifecycleScope.launch{
+
+                val handler = CoroutineExceptionHandler{
+                    a,b->
+                    Log.d("TAG","${b.message}")
+                }
+                lifecycleScope.launch(handler){
                     val result = RetrofitHelper.userAPI.createCustomer(c)
+
+
                     if(result.isSuccessful && result.body()!=null){
                         dialog.dismiss()
                         val prefs = getSharedPreferences(Constants.SHARED_PREF_NAME, MODE_PRIVATE)
@@ -65,6 +73,7 @@ class CreateUserActivity : AppCompatActivity() {
                         startActivity(Intent(this@CreateUserActivity,MainActivity::class.java))
                     }else{
                         dialog.dismiss()
+                        Log.d("TAG","sdfasdf ${result.message()} ${result.errorBody()} ${result.isSuccessful}")
                         Toast.makeText(this@CreateUserActivity,"Can't create user right now",Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -123,7 +132,7 @@ class CreateUserActivity : AppCompatActivity() {
         binding.phoneNo.text = Editable.Factory.getInstance().newEditable(user!!.phoneNumber)
 
         binding.retcreateBtn.setOnClickListener {
-            if(validateCustomerFields()){
+            if(validateRetailerFields()){
 
                 val dialog = LoadingDialog()
                 dialog.show(supportFragmentManager,"loading")

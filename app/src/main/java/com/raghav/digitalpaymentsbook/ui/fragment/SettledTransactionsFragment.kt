@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.raghav.digitalpaymentsbook.adapter.TransactionsAdapter
 import com.raghav.digitalpaymentsbook.data.network.RetrofitHelper
 import com.raghav.digitalpaymentsbook.databinding.FragmentSettledTransactionsBinding
@@ -39,6 +40,9 @@ class SettledTransactionsFragment : Fragment() {
         viewmodel.settledList.observe(requireActivity()){
             adapter.submitList(it.toMutableList())
         }
+
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireActivity())
+        binding.recyclerView.adapter=adapter
 
         lifecycleScope.launch {
             val result = RetrofitHelper.userAPI.getAllSettledTransactions(viewmodel.customer!!.id,viewmodel.retailer!!.id)

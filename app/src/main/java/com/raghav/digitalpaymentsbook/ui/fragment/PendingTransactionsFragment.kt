@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.raghav.digitalpaymentsbook.R
 import com.raghav.digitalpaymentsbook.adapter.TransactionsAdapter
 import com.raghav.digitalpaymentsbook.data.network.RetrofitHelper
@@ -40,6 +41,9 @@ class PendingTransactionsFragment : Fragment() {
         viewmodel.pendingList.observe(requireActivity()){
             adapter.submitList(it.toMutableList())
         }
+
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireActivity())
+        binding.recyclerView.adapter=adapter
 
         lifecycleScope.launch {
             val result = RetrofitHelper.userAPI.getAllPendingTransactions(viewmodel.customer!!.id,viewmodel.retailer!!.id)

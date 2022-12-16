@@ -1,6 +1,7 @@
 package com.raghav.digitalpaymentsbook.ui.activity
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -22,12 +23,13 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity(),CustomerAdapter.OnItemClickListener,RetailerAdapter.OnItemClickListener {
 
     lateinit var binding: ActivityMainBinding
-    val prefs = getSharedPreferences(Constants.SHARED_PREF_NAME, MODE_PRIVATE)
+    lateinit var prefs : SharedPreferences
     lateinit var viewModel: MainViewmodel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        prefs = getSharedPreferences(Constants.SHARED_PREF_NAME, MODE_PRIVATE)
 
         if (FirebaseAuth.getInstance().currentUser == null
             || prefs.userExist()
@@ -61,7 +63,7 @@ class MainActivity : AppCompatActivity(),CustomerAdapter.OnItemClickListener,Ret
         }
 
         lifecycleScope.launch{
-            val result = RetrofitHelper.userAPI.getAllRetailers(prefs.getCustomer())
+            val result = RetrofitHelper.userAPI.getAllRetailers(prefs.getCustomer().id)
             if(result.isSuccessful && result.body()!=null){
                 val list = result.body()!!
                 viewModel.retailerList.value = list.toMutableList()

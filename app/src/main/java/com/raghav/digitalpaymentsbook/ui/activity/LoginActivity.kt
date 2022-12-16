@@ -13,6 +13,8 @@ import androidx.lifecycle.lifecycleScope
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.*
+import com.raghav.digitalpaymentsbook.data.model.Customer
+import com.raghav.digitalpaymentsbook.data.model.Retailer
 import com.raghav.digitalpaymentsbook.data.network.RetrofitHelper
 import com.raghav.digitalpaymentsbook.databinding.ActivityLoginBinding
 import com.raghav.digitalpaymentsbook.ui.dialog.ChooseRoleDialog
@@ -159,65 +161,56 @@ class LoginActivity : AppCompatActivity() {
                     }
 
                     //testing
-                    dialog.dismiss()
-                    val roleDialog = ChooseRoleDialog()
-                    roleDialog.show(supportFragmentManager,"roleDialog")
-                    roleDialog.isCancelable=false
+//                    dialog.dismiss()
+//                    val roleDialog = ChooseRoleDialog()
+//                    roleDialog.show(supportFragmentManager,"roleDialog")
+//                    roleDialog.isCancelable=false
 
 
-//                    if (NetworkUtils.isInternetAvailable(this)) {
-//
-//                        lifecycleScope.launch(handler) {
-//
-//                            if (user != null && user.phoneNumber != null) {
-//
-//                                val resCus = RetrofitHelper.userAPI.isCustomer(user.phoneNumber!!.substring(1))
-//                                val resRet = RetrofitHelper.userAPI.isRetailer(user.phoneNumber!!.substring(1))
-//
-//                                //user already has an account as customer
-//                                if(resCus.isSuccessful && resCus.body()!=null){
-//                                    dialog.dismiss()
-//                                    val sharedPref =
-//                                        getSharedPreferences(Constants.SHARED_PREF_NAME, Context.MODE_PRIVATE)
-//                                    sharedPref.add(resCus.body()!!)
-//
-//                                    startActivity(
-//                                        Intent(
-//                                            this@LoginActivity,
-//                                            MainActivity::class.java
-//                                        )
-//                                    )
-//                                //user already has an account as retailer
-//                                }else if(resRet.isSuccessful && resRet.body()!=null){
-//                                    dialog.dismiss()
-//                                    val sharedPref =
-//                                        getSharedPreferences(Constants.SHARED_PREF_NAME, Context.MODE_PRIVATE)
-//                                    sharedPref.add(resRet.body()!!)
-//
-//                                    startActivity(
-//                                        Intent(
-//                                            this@LoginActivity,
-//                                            MainActivity::class.java
-//                                        )
-//                                    )
-//                                //user doesn't have an account, create new
-//                                }else{
-//                                    dialog.dismiss()
-//                                    val roleDialog = ChooseRoleDialog()
-//                                    roleDialog.show(supportFragmentManager,"roleDialog")
-//                                    roleDialog.isCancelable=false
-//                                }
-//                            }
-//                        }
-//                    } else {
-//
-//                        dialog.dismiss()
-//                        Toast.makeText(
-//                            this@LoginActivity,
-//                            "Please make sure you have internet access",
-//                            Toast.LENGTH_SHORT
-//                        ).show()
-//                    }
+                    if (NetworkUtils.isInternetAvailable(this)) {
+
+                        lifecycleScope.launch(handler) {
+
+                            if (user != null && user.phoneNumber != null) {
+
+                                val result = RetrofitHelper.userAPI.getUser(user.phoneNumber!!.substring(1))
+
+                                //user already has an account as customer
+                                if(result.isSuccessful && result.body()!=null){
+                                    dialog.dismiss()
+                                    val sharedPref =
+                                        getSharedPreferences(Constants.SHARED_PREF_NAME, Context.MODE_PRIVATE)
+
+                                    val u = result.body()!!
+                                    if(u.role == Constants.CUSTOMER_STR){
+                                        sharedPref.add(Customer(u.name,u.password,u.phone,u.address,u.id))
+                                    }else{
+                                        sharedPref.add(Retailer(u.name,u.password,u.phone,u.address,u.shopName,u.id))
+                                    }
+
+                                    startActivity(
+                                        Intent(
+                                            this@LoginActivity,
+                                            MainActivity::class.java
+                                        )
+                                    )
+                                }else{
+                                    dialog.dismiss()
+                                    val roleDialog = ChooseRoleDialog()
+                                    roleDialog.show(supportFragmentManager,"roleDialog")
+                                    roleDialog.isCancelable=false
+                                }
+                            }
+                        }
+                    } else {
+
+                        dialog.dismiss()
+                        Toast.makeText(
+                            this@LoginActivity,
+                            "Please make sure you have internet access",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
 
                 } else {
                     dialog.dismiss()

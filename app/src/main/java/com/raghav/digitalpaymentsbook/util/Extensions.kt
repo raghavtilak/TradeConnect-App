@@ -67,7 +67,7 @@ fun SharedPreferences.userExist(): Boolean {
 }
 
 fun SharedPreferences.typeOfUser(): String {
-    return if(this.getString(CUSTOMER_STR,"").equals("")) CUSTOMER_STR
-    else if(this.getString(RETAILER_STR,"").equals("")) RETAILER_STR
+    return if(!this.getString(CUSTOMER_STR,"").equals("")) CUSTOMER_STR
+    else if(!this.getString(RETAILER_STR,"").equals("")) RETAILER_STR
     else ""
 }
