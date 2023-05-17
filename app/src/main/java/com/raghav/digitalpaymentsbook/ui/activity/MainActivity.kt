@@ -1,72 +1,111 @@
 package com.raghav.digitalpaymentsbook.ui.activity
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
-import android.view.View
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
-import com.raghav.digitalpaymentsbook.adapter.CustomerAdapter
-import com.raghav.digitalpaymentsbook.adapter.RetailerAdapter
-import com.raghav.digitalpaymentsbook.data.model.Customer
-import com.raghav.digitalpaymentsbook.data.model.Retailer
-import com.raghav.digitalpaymentsbook.data.network.RetrofitHelper
+import com.raghav.digitalpaymentsbook.data.model.enums.UserRole
 import com.raghav.digitalpaymentsbook.databinding.ActivityMainBinding
-import com.raghav.digitalpaymentsbook.ui.dialog.AddCustomerDialog
 import com.raghav.digitalpaymentsbook.ui.viewmodel.MainViewmodel
 import com.raghav.digitalpaymentsbook.util.*
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.flow.onEmpty
 import kotlinx.coroutines.launch
 
-class MainActivity : AppCompatActivity(),CustomerAdapter.OnItemClickListener,RetailerAdapter.OnItemClickListener {
+class MainActivity : AppCompatActivity() {
+//    , CustomerAdapter.OnItemClickListener,
+//    RetailerAdapter.OnItemClickListener {
 
     lateinit var binding: ActivityMainBinding
-    lateinit var prefs : SharedPreferences
     lateinit var viewModel: MainViewmodel
+
+    val handler = CoroutineExceptionHandler { coroutineContext, throwable ->
+        Log.d(
+            "TAG",
+            "ERROR=${throwable.message}"
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        prefs = getSharedPreferences(Constants.SHARED_PREF_NAME, MODE_PRIVATE)
+            val fb = FirebaseAuth.getInstance()
+            if (fb.currentUser == null || !PreferenceManager.getInstance(this).userExist()) {
+                if (fb.currentUser != null) {
+                    fb.signOut()
+                    fb.currentUser!!.delete().addOnCompleteListener {
+                        startActivity(Intent(this@MainActivity, SignInActivity::class.java))
+                        finish()
+                    }
+                }else{
+                    startActivity(Intent(this@MainActivity, SignInActivity::class.java))
+                    finish()
+                }
 
-        if (FirebaseAuth.getInstance().currentUser == null
-            || prefs.userExist()
-        ) {
-            startActivity(Intent(this, LoginActivity::class.java))
-            finish()
-        } else {
-            binding = ActivityMainBinding.inflate(layoutInflater)
-            setContentView(binding.root)
-
-            viewModel = ViewModelProvider(this)[MainViewmodel::class.java]
-
-            if (prefs.typeOfUser() == Constants.CUSTOMER_STR) {
-                showForCustomer()
-            } else if (prefs.typeOfUser() == Constants.RETAILER_STR) {
-                showForRetailer()
             } else {
-                startActivity(Intent(this, LoginActivity::class.java))
-                finish()
-            }
-        }
-    }
 
+//            viewModel = ViewModelProvider(this)[MainViewmodel::class.java]
+                when (PreferenceManager.getInstance(this).typeOfUser()) {
+                    UserRole.Retailer -> {
+                        binding.businessName.text = PreferenceManager.getInstance(this).getRetailer().businessName
+                    }
+                    UserRole.Customer -> {
+                        binding.businessName.text = "Retailers"
+
+                    }
+                    null -> {
+
+                    }
+                }
+
+                binding.viewStore.setOnClickListener {
+                    startActivity(Intent(this@MainActivity, ViewStoreActivity::class.java))
+
+                }
+                binding.myOrder.setOnClickListener {
+                    startActivity(Intent(this@MainActivity, MyOrderActivity::class.java))
+
+                }
+                binding.mySells.setOnClickListener {
+                    startActivity(Intent(this@MainActivity, MySellsActivity::class.java))
+
+                }
+                binding.myConnections.setOnClickListener {
+                    startActivity(Intent(this@MainActivity, MyConnectionsActivity::class.java))
+
+                }
+
+            }
+
+        }
+
+
+/*
     private fun showForCustomer() {
-        binding.addCustomer.visibility = View.GONE
-        binding.shopName.text = "Retailers"
+        binding.store.isVisible = false
+        binding.addTransaction.isVisible = false
+        binding.businessName.text = "Retailers"
 
         val adapter = RetailerAdapter(this)
-        viewModel.retailerList.observe(this){
+        viewModel.retailerList.observe(this) {
             adapter.submitList(it.toMutableList())
         }
 
-        lifecycleScope.launch{
-            val result = RetrofitHelper.userAPI.getAllRetailers(prefs.getCustomer().id)
-            if(result.isSuccessful && result.body()!=null){
+        lifecycleScope.launch(handler) {
+            Log.d("TAG","at least here ${prefs.getCustomer().id!!.toHexString()}")
+
+            val result =
+                RetrofitHelper.userAPI.getRetailerOfACustomers(prefs.getCustomer().id!!.toHexString())
+            if (result.isSuccessful && result.body() != null) {
                 val list = result.body()!!
+                Log.d("TAG","custo her ${result.body()}")
                 viewModel.retailerList.value = list.toMutableList()
+            }else{
+                Log.d("TAG","custo her ${result.body()}")
             }
         }
 
@@ -76,29 +115,41 @@ class MainActivity : AppCompatActivity(),CustomerAdapter.OnItemClickListener,Ret
     }
 
     private fun showForRetailer() {
-        binding.addCustomer.visibility = View.VISIBLE
+        Log.d("TAG", "here 2")
+
+        binding.addTransaction.visibility = View.VISIBLE
 
         val r = prefs.getRetailer()
-        binding.shopName.text = r.shopName
+        binding.businessName.text = r.businessName
 
         val adapter = CustomerAdapter(this)
-        viewModel.customerList.observe(this){
+        viewModel.customerList.observe(this) {
             adapter.submitList(it.toMutableList())
         }
 
-        binding.addCustomer.setOnClickListener {
-            val addBottomDialogFragment = AddCustomerDialog()
-            addBottomDialogFragment.show(
-                supportFragmentManager,
-                "TAG"
-            )
+        binding.store.setOnClickListener {
+            startActivity(Intent(this@MainActivity, ViewStoreActivity::class.java))
+        }
+        binding.addTransaction.setOnClickListener {
+//            val addBottomDialogFragment = AddCustomerDialog()
+//            addBottomDialogFragment.show(
+//                supportFragmentManager,
+//                "TAG"
+//            )
+            startActivity(Intent(this@MainActivity, AddProductActivity::class.java))
         }
 
-        lifecycleScope.launch{
-            val result = RetrofitHelper.userAPI.getAllCustomers(prefs.getRetailer())
-            if(result.isSuccessful && result.body()!=null){
+        Log.d("TAG", "here4")
+
+        lifecycleScope.launch(handler) {
+            val result =
+                RetrofitHelper.userAPI.getCustomersOfARetailer(prefs.getRetailer().id.toHexString())
+            if (result.isSuccessful && result.body() != null) {
+                Log.d("TAG", "reponse:${result.body()}")
                 val list = result.body()!!
                 viewModel.customerList.value = list.toMutableList()
+            } else {
+                Log.d("TAG", "reponse:${result.body()}, ${result}")
             }
         }
 
@@ -108,14 +159,19 @@ class MainActivity : AppCompatActivity(),CustomerAdapter.OnItemClickListener,Ret
     }
 
     override fun onItemClick(customer: Customer) {
-        startActivity(Intent(this,TransactionsActivity::class.java)
-            .putExtra(Constants.CUSTOMER_STR,customer))
+        startActivity(
+            Intent(this, TransactionsActivity::class.java)
+                .putExtra(UserRole.Customer.name, customer)
+        )
     }
 
     override fun onItemClick(retailer: Retailer) {
-        startActivity(Intent(this,TransactionsActivity::class.java)
-            .putExtra(Constants.RETAILER_STR,retailer))
+        startActivity(
+            Intent(this, TransactionsActivity::class.java)
+                .putExtra(UserRole.Retailer.name, retailer)
+        )
     }
 
+*/
 
 }

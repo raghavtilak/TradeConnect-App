@@ -21,7 +21,7 @@
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
-        android:layout_margin="20dp"
+        android:layout_marginTop="20dp"
         android:layout_below="@id/t1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -39,15 +39,5 @@
         android:layout_below="@id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/addTransaction"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="15dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        app:elevation="10dp"
-        android:src="@drawable/ic_baseline_add_24"/>
 
 </RelativeLayout>

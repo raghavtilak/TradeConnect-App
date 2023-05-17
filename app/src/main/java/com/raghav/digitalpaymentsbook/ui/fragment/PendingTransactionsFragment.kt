@@ -37,7 +37,7 @@ class PendingTransactionsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewmodel = ViewModelProvider(requireActivity())[TransactionViewmodel::class.java]
-        val adapter = TransactionsAdapter()
+        val adapter = TransactionsAdapter(false)
         viewmodel.pendingList.observe(requireActivity()){
             adapter.submitList(it.toMutableList())
         }
@@ -45,18 +45,12 @@ class PendingTransactionsFragment : Fragment() {
         binding.recyclerView.layoutManager = LinearLayoutManager(requireActivity())
         binding.recyclerView.adapter=adapter
 
-        lifecycleScope.launch {
-            val result = RetrofitHelper.userAPI.getAllPendingTransactions(viewmodel.customer!!.id,viewmodel.retailer!!.id)
-            if(result.isSuccessful && result.body()!=null){
-                val list = result.body()!!
-                viewmodel.pendingList.value = list.toMutableList()
-            }else{
-                Toast.makeText(requireActivity(),"Some error occurred",Toast.LENGTH_SHORT).show()
-            }
-        }
 
     }
 
+    fun pay(){
+
+    }
     override fun onDestroy() {
         super.onDestroy()
         _binding=null

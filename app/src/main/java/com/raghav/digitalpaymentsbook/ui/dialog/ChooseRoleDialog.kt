@@ -8,11 +8,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
+import com.raghav.digitalpaymentsbook.data.model.enums.UserRole
 import com.raghav.digitalpaymentsbook.databinding.DialogChooseRoleBinding
 import com.raghav.digitalpaymentsbook.ui.activity.CreateUserActivity
-import com.raghav.digitalpaymentsbook.util.Constants.CUSTOMER
-import com.raghav.digitalpaymentsbook.util.Constants.RETAILER
-import com.raghav.digitalpaymentsbook.util.setWidthPercent
 import com.raghav.digitalpaymentsbook.util.setupWidthToMatchParent
 
 class ChooseRoleDialog : DialogFragment() {
@@ -36,11 +34,13 @@ class ChooseRoleDialog : DialogFragment() {
 setupWidthToMatchParent()
 
         binding.customerBtn.setOnClickListener {
-            startActivity(Intent(requireActivity(),CreateUserActivity::class.java).putExtra("role",CUSTOMER))
+            startActivity(Intent(requireActivity(),CreateUserActivity::class.java).putExtra("role",
+                UserRole.Customer))
             dialog?.dismiss()
         }
         binding.retailerBtn.setOnClickListener {
-            startActivity(Intent(requireActivity(),CreateUserActivity::class.java).putExtra("role",RETAILER))
+            startActivity(Intent(requireActivity(),CreateUserActivity::class.java).putExtra("role",
+                UserRole.Retailer))
             dialog?.dismiss()
         }
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))

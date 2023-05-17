@@ -8,13 +8,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.raghav.digitalpaymentsbook.data.model.Retailer
 import com.raghav.digitalpaymentsbook.databinding.ItemRetailerBinding
 
-class RetailerAdapter(private val onItemClickListener: OnItemClickListener) : ListAdapter<Retailer, RetailerAdapter.ViewHolder>(COMPARATOR) {
+class RetailerAdapter(private val onItemClickListener: (retailer: Retailer)->Unit) : ListAdapter<Retailer, RetailerAdapter.ViewHolder>(COMPARATOR) {
 
     class ViewHolder(val binding: ItemRetailerBinding) : RecyclerView.ViewHolder(binding.root)
 
     companion object COMPARATOR : DiffUtil.ItemCallback<Retailer>(){
         override fun areItemsTheSame(oldItem: Retailer, newItem: Retailer): Boolean {
-            return oldItem.id == newItem.id
+            return oldItem.phone == newItem.phone
         }
 
         override fun areContentsTheSame(oldItem: Retailer, newItem: Retailer): Boolean {
@@ -33,21 +33,18 @@ class RetailerAdapter(private val onItemClickListener: OnItemClickListener) : Li
         holder.binding.apply {
             val c = currentList[holder.adapterPosition]
             retailerName.text = c.name
-            shopName.text = c.shopName
+            businessName.text = c.businessName
             phone.text = c.phone
-            avatarText.text = if(c.shopName.contains(" "))
-                "${c.shopName.split(" ")[0][0]}${c.shopName.split(" ")[1][0]}"
+            avatarText.text = if(c.businessName.contains(" "))
+                "${c.businessName.split(" ")[0][0]}${c.businessName.split(" ")[1][0]}"
             else
-                c.shopName[0].toString()
+                c.businessName[0].toString()
 
             root.setOnClickListener {
-                onItemClickListener.onItemClick(c)
+                onItemClickListener(c)
             }
         }
     }
 
-    interface OnItemClickListener{
-        fun onItemClick(retailer: Retailer)
-    }
 
 }

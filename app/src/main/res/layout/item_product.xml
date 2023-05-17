@@ -17,18 +17,18 @@
         android:textSize="18sp"
         android:textColor="@color/colorSecondary"/>
 
-    <TextView
-        android:id="@+id/price"
-        android:layout_toStartOf="@id/paid"
-        android:layout_marginHorizontal="10dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="400"
-        android:textSize="18sp"
-        android:textColor="@color/colorSecondary"/>
+<!--    <TextView-->
+<!--        android:id="@+id/price"-->
+<!--        android:layout_toStartOf="@id/paid"-->
+<!--        android:layout_marginHorizontal="10dp"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="400"-->
+<!--        android:textSize="18sp"-->
+<!--        android:textColor="@color/colorSecondary"/>-->
 
     <TextView
-        android:id="@+id/paid"
+        android:id="@+id/price"
         android:layout_marginEnd="20dp"
         android:layout_toStartOf="@id/removeBtn"
         android:layout_width="wrap_content"

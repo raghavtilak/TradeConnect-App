@@ -5,11 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimaryDark"
-    tools:context=".ui.activity.LoginActivity">
+    tools:context=".ui.activity.SignUpActivity">
 
     <RelativeLayout
         android:id="@+id/otpRelative"
-        android:visibility="visible"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -43,7 +43,7 @@
             android:layout_below="@id/t22"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
-            android:text="We have sent an OTP to 8619147272"
+            android:text="We have sent an OTP"
             android:textSize="18sp" />
 
         <com.google.android.material.card.MaterialCardView
@@ -119,7 +119,7 @@
     </RelativeLayout>
     <RelativeLayout
         android:id="@+id/loginRelative"
-        android:visibility="gone"
+        android:visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -131,7 +131,7 @@
             android:layout_alignParentTop="true"
             android:layout_marginStart="20dp"
             android:layout_marginTop="20dp"
-            android:text="Login"
+            android:text="Sign Up"
             android:textSize="42sp"
             android:textStyle="bold" />
 
@@ -203,5 +203,30 @@
             android:src="@drawable/ic_baseline_arrow_forward_24"
             app:backgroundTint="@color/white"
             app:elevation="8dp" />
+
+<!--        <LinearLayout-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="horizontal"-->
+<!--            android:layout_below="@id/nextBtn"-->
+<!--            android:layout_centerHorizontal="true">-->
+<!--        <TextView-->
+<!--            android:id="@+id/t4"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginStart="20dp"-->
+<!--            android:layout_marginEnd="5dp"-->
+<!--            android:text="Already registered?"-->
+<!--            android:textSize="18sp" />-->
+
+<!--        <TextView-->
+<!--            android:id="@+id/signin"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginEnd="20dp"-->
+<!--            android:textColor="@color/colorSecondary"-->
+<!--            android:text="Sign in"-->
+<!--            android:textSize="18sp" />-->
+<!--        </LinearLayout>-->
     </RelativeLayout>
 </RelativeLayout>

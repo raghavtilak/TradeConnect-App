@@ -1,7 +1,9 @@
 package com.raghav.digitalpaymentsbook.data.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class Product(
-    val name: String,
-    val price: Int,
-    val paid: Int = 0
-)
+    val productName: String,
+    val productPrice: Int) : Parcelable

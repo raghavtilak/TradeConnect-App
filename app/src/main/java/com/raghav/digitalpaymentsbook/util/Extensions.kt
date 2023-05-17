@@ -5,11 +5,9 @@ import android.content.res.Resources
 import android.graphics.Rect
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import com.google.gson.Gson
 import com.raghav.digitalpaymentsbook.data.model.Customer
 import com.raghav.digitalpaymentsbook.data.model.Retailer
-import com.raghav.digitalpaymentsbook.util.Constants.CUSTOMER_STR
-import com.raghav.digitalpaymentsbook.util.Constants.RETAILER_STR
+import com.raghav.digitalpaymentsbook.data.model.enums.UserRole
 
 /**
  * Call this method (in onActivityCreated or later) to set
@@ -33,41 +31,51 @@ fun DialogFragment.setupWidthToMatchParent() {
 
 fun SharedPreferences.add(customer: Customer){
     with(this.edit()) {
-        val g = Gson()
+        val g = GsonUtils.gson
         val json = g.toJson(customer)
-        putString(CUSTOMER_STR, json)
+        putString(UserRole.Customer.name, json)
         apply()
     }
 }
 
 fun SharedPreferences.add(retailer: Retailer){
     with(this.edit()) {
-        val g = Gson()
+        val g = GsonUtils.gson
         val json = g.toJson(retailer)
-        putString(RETAILER_STR, json)
+        putString(UserRole.Retailer.name, json)
         apply()
     }
 }
 
 fun SharedPreferences.getCustomer(): Customer {
-    val json = this.getString(CUSTOMER_STR, "")
-    val g = Gson()
+    val json = this.getString(UserRole.Customer.name, "")
+    val g = GsonUtils.gson
     return g.fromJson(json, Customer::class.java)
 }
 
 fun SharedPreferences.getRetailer(): Retailer {
-    val json = this.getString(RETAILER_STR, "")
-    val g = Gson()
+    val json = this.getString(UserRole.Retailer.name, "")
+    val g = GsonUtils.gson
     return g.fromJson(json, Retailer::class.java)
 }
 
+//return true if exists
 fun SharedPreferences.userExist(): Boolean {
-    return !(this.getString(CUSTOMER_STR,"").equals("")
-        && this.getString(RETAILER_STR,"").equals(""))
+    return (this.getString(UserRole.Customer.name,"").equals("") || this.getString(UserRole.Retailer.name,"").equals(""))
 }
 
-fun SharedPreferences.typeOfUser(): String {
-    return if(!this.getString(CUSTOMER_STR,"").equals("")) CUSTOMER_STR
-    else if(!this.getString(RETAILER_STR,"").equals("")) RETAILER_STR
-    else ""
+fun SharedPreferences.typeOfUser(): UserRole? {
+    return if(!this.getString(UserRole.Customer.name,"").equals("")) UserRole.Customer
+    else if(!this.getString(UserRole.Retailer.name,"").equals("")) UserRole.Retailer
+    else null
+}
+
+fun SharedPreferences.saveAuthToken(token : String) {
+    with(this.edit()) {
+        putString(Constants.TOKEN, token)
+        apply()
+    }
+}
+fun SharedPreferences.getAuthToken(): String {
+    return this.getString(Constants.TOKEN, "")!!
 }

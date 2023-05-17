@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId "com.raghav.digitalpaymentsbook"
-        minSdk 22
+        minSdk 26
         targetSdk 32
         versionCode 1
         versionName "1.0"
@@ -49,6 +49,8 @@ dependencies {
 
     implementation platform('com.google.firebase:firebase-bom:31.1.0')
     implementation 'com.google.firebase:firebase-auth-ktx'
+    implementation 'com.google.android.gms:play-services-auth:20.5.0'
+
 
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4'
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1"
@@ -58,4 +60,16 @@ dependencies {
 
     //user circular avatar
     implementation "xyz.schwaab:avvylib:1.2.0"
+
+    implementation 'org.mongodb:bson:4.9.0'
+
+    implementation 'dev.shreyaspatil.EasyUpiPayment:EasyUpiPayment:3.0.3'
+
+    // https://mvnrepository.com/artifact/org.apache.poi/poi
+    implementation 'org.apache.poi:poi:5.2.3'
+
+
+    //for saving jwt token
+    implementation "androidx.datastore:datastore-preferences:1.0.0"
+
 }

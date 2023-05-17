@@ -6,7 +6,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.raghav.digitalpaymentsbook.ui.fragment.PendingTransactionsFragment
 import com.raghav.digitalpaymentsbook.ui.fragment.SettledTransactionsFragment
 
-class TabAdapter(fragmentActivity: FragmentActivity)
+class TransactionsTabAdapter(fragmentActivity: FragmentActivity)
     : FragmentStateAdapter(fragmentActivity) {
 
     override fun createFragment(position: Int): Fragment {

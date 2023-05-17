@@ -15,7 +15,7 @@ class ProductAdapter(private val onRemoveClickListener: OnRemoveClickListener) :
 
     companion object COMPARATOR : DiffUtil.ItemCallback<Product>(){
         override fun areItemsTheSame(oldItem: Product, newItem: Product): Boolean {
-            return oldItem.name == newItem.name
+            return oldItem.productName == newItem.productName
         }
 
         override fun areContentsTheSame(oldItem: Product, newItem: Product): Boolean {
@@ -33,9 +33,8 @@ class ProductAdapter(private val onRemoveClickListener: OnRemoveClickListener) :
 
         holder.binding.apply {
             val p = currentList[holder.adapterPosition]
-            productName.text = p.name
-            price.text = p.price.toString()
-            paid.text = p.price.toString()
+            productName.text = p.productName
+            price.text = p.productPrice.toString()
             removeBtn.setOnClickListener {
                 onRemoveClickListener.onItemRemove(p)
             }

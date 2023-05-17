@@ -1,52 +1,68 @@
 package com.raghav.digitalpaymentsbook.data.network
 
-import com.raghav.digitalpaymentsbook.data.model.Customer
-import com.raghav.digitalpaymentsbook.data.model.Retailer
-import com.raghav.digitalpaymentsbook.data.model.Transaction
-import com.raghav.digitalpaymentsbook.data.model.User
+import com.raghav.digitalpaymentsbook.data.model.*
+import com.raghav.digitalpaymentsbook.data.model.apis.RetailerSignIn
+import com.raghav.digitalpaymentsbook.data.model.apis.ServerResponse
+import com.raghav.digitalpaymentsbook.data.model.enums.BusinessTypes
+import com.raghav.digitalpaymentsbook.data.model.enums.ConnectionStatus
+import org.bson.types.ObjectId
 import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
-import retrofit2.http.GET
-import retrofit2.http.POST
+import retrofit2.http.*
 
 interface UserAPI {
 
-    @FormUrlEncoded
-    @POST("user/by_phone")
-    suspend fun getUser(@Field("phone") phone:String):Response<User>
+//    @FormUrlEncoded
+    @GET("get_user")
+    suspend fun getUser(@Query("phone") rsign: RetailerSignIn):Response<User>
 
-    @POST("")
-    suspend fun isCustomer(phone:String):Response<Customer>
 
-    @POST("")
-    suspend fun isRetailer(phone:String):Response<Retailer>
+    @POST("retailer/signin")
+    suspend fun retailerSignIn(@Body rsign:RetailerSignIn):Response<String>
+
+    @POST("retailer/signup")
+    suspend fun createRetailer(@Body retailer: User):Response<String>
+
 
     @POST("customer/signup")
-    suspend fun createCustomer(@Body customer: Customer):Response<Customer>
+    suspend fun createCustomer(@Body customer: User):Response<String>
 
-    @POST("")
-    suspend fun createRetailer(retailer: Retailer):Response<Retailer>
 
-    @POST("")
-    suspend fun getAllCustomers(retailer: Retailer):Response<List<Customer>>
+    @GET("customer/retailers/{customerId}")
+    suspend fun getRetailerOfACustomers(@Path("customerId") customerId: String):Response<List<Retailer>>
 
-//    @POST("")
-//    suspend fun getAllRetailers(customer: Customer):Response<List<Retailer>>
+    @GET("retailer/customers/{retailerId}")
+    suspend fun getCustomersOfARetailer(@Path("retailerId") retailerId: String):Response<List<Customer>>
 
-    @POST("")
-    suspend fun getAllRetailers(custId: Int):Response<List<Retailer>>
+    @POST("retailer/create_transaction/{retailerId}")
+    suspend fun addTransaction(@Body transaction: Transaction,@Path("retailerId")retailerId:String):Response<Transaction>
 
-    @POST("")
-    suspend fun addTransaction(transaction: Transaction):Response<Transaction>
+    @GET("retailer/customer/transactions/{retailerId}")
+    suspend fun getAllTransactions(@Path("retailerId")retailerId:String,@Query("customerPhone") custPhone:Long):Response<List<Transaction>>
 
-    @POST("")
-    suspend fun getAllPendingTransactions(custId:Int,retId:Int):Response<List<Transaction>>
+    @GET("business_types")
+    suspend fun getAllBusinessTypes():Response<List<BusinessTypes>>
 
-    @POST("")
-    suspend fun getAllSettledTransactions(custId:Int,retId:Int):Response<List<Transaction>>
+    @GET("my_connections")
+    suspend fun getMyConnections(@Query("status") status: ConnectionStatus):Response<List<Connection>>
 
+    @GET("retailer/search_retailers")
+    suspend fun getSearchedRetailers(@Query("advance_query") advance_query:String):Response<List<Retailer>>
+
+    @POST("retailer/create_connection_req")
+    suspend fun createConnectionRequest(@Body recipient:String):Response<ServerResponse>
+
+    @POST("retailer/create_connection_req")
+    suspend fun updateConnectionReq(@Body status: ConnectionStatus):Response<ServerResponse>
+
+    @GET("retailer/my_sells")
+    suspend fun mySells():Response<List<SellItem>>
+
+    @GET("retailer/my_inventory")
+    suspend fun myStore():Response<List<StoreItem>>
+
+
+    @GET("retailer/get_batches_by_id")
+    suspend fun getBatchesById(@Query("ids") ids:List<ObjectId>):Response<List<Batch>>
 
 
 }

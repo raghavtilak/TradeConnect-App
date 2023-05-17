@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.raghav.digitalpaymentsbook.data.model.Customer
 import com.raghav.digitalpaymentsbook.data.model.Retailer
+import com.raghav.digitalpaymentsbook.data.model.Transaction
 
 class MainViewmodel : ViewModel() {
 

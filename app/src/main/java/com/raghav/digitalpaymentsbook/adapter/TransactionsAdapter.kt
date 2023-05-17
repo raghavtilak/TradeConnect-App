@@ -2,14 +2,16 @@ package com.raghav.digitalpaymentsbook.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.raghav.digitalpaymentsbook.data.model.Transaction
 import com.raghav.digitalpaymentsbook.databinding.ItemCustomerBinding
 import com.raghav.digitalpaymentsbook.databinding.ItemTransactionBinding
+import java.text.SimpleDateFormat
 
-class TransactionsAdapter : ListAdapter<Transaction, TransactionsAdapter.ViewHolder>(COMPARATOR) {
+class TransactionsAdapter(val settled:Boolean) : ListAdapter<Transaction, TransactionsAdapter.ViewHolder>(COMPARATOR) {
 
     class ViewHolder(val binding: ItemTransactionBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -33,7 +35,11 @@ class TransactionsAdapter : ListAdapter<Transaction, TransactionsAdapter.ViewHol
 
         holder.binding.apply {
             val c = currentList[holder.adapterPosition]
-
+            name.text = c.transactionName
+            date.text = SimpleDateFormat("dd/MM/yyyy").format(c.createdAt)
+            due.text = c.due.toString()
+            due.isVisible = !settled
+            pay.isVisible = !settled
         }
     }
 

@@ -1,10 +1,8 @@
 package com.raghav.digitalpaymentsbook.ui.activity
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -15,21 +13,22 @@ import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.*
 import com.raghav.digitalpaymentsbook.data.model.Customer
 import com.raghav.digitalpaymentsbook.data.model.Retailer
+import com.raghav.digitalpaymentsbook.data.model.apis.RetailerSignIn
+import com.raghav.digitalpaymentsbook.data.model.enums.UserRole
 import com.raghav.digitalpaymentsbook.data.network.RetrofitHelper
 import com.raghav.digitalpaymentsbook.databinding.ActivityLoginBinding
 import com.raghav.digitalpaymentsbook.ui.dialog.ChooseRoleDialog
 import com.raghav.digitalpaymentsbook.ui.dialog.LoadingDialog
 import com.raghav.digitalpaymentsbook.util.Constants
-import com.raghav.digitalpaymentsbook.util.NetworkUtils
+import com.raghav.digitalpaymentsbook.util.PreferenceManager
 import com.raghav.digitalpaymentsbook.util.add
-import kotlinx.coroutines.CoroutineExceptionHandler
+import com.raghav.digitalpaymentsbook.util.saveAuthToken
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import okhttp3.MediaType
-import okhttp3.RequestBody
 import java.util.concurrent.TimeUnit
 
 
-class LoginActivity : AppCompatActivity() {
+class SignUpActivity : AppCompatActivity() {
 
     private lateinit var resendToken: PhoneAuthProvider.ForceResendingToken
     private lateinit var storedVerificationId: String
@@ -59,13 +58,13 @@ class LoginActivity : AppCompatActivity() {
             dialog.dismiss()
             if (e is FirebaseAuthInvalidCredentialsException) {
                 Toast.makeText(
-                    this@LoginActivity,
+                    this@SignUpActivity,
                     "Can't verify phone right now",
                     Toast.LENGTH_SHORT
                 ).show()
             } else if (e is FirebaseTooManyRequestsException) {
                 Toast.makeText(
-                    this@LoginActivity,
+                    this@SignUpActivity,
                     "Can't verify phone right now",
                     Toast.LENGTH_SHORT
                 ).show()
@@ -128,6 +127,7 @@ class LoginActivity : AppCompatActivity() {
             verifyVerificationCode(binding.editTextOtp.text.toString())
         }
 
+
     }
 
     private fun verifyVerificationCode(code: String) {
@@ -148,69 +148,73 @@ class LoginActivity : AppCompatActivity() {
 
                     val user = task.result?.user
 
-                    val map = mutableMapOf<String?, RequestBody?>()
-                    if (user?.phoneNumber != null)
-                        map["phone"] = user.phoneNumber?.let { it1 ->
-                            RequestBody
-                                .create(MediaType.parse("text/plain"), it1.substring(1))
+                    lifecycleScope.launch {
+
+
+                        //dumping '+91' from the user phone number
+                        val job1 = async {
+                            RetrofitHelper.getInstance(this@SignUpActivity).retailerSignIn(
+                                RetailerSignIn(null, user?.phoneNumber!!.substring(3))
+                            )
                         }
-                    map["name"] = RequestBody.create(MediaType.parse("text/plain"), "Undefined")
 
-                    val handler = CoroutineExceptionHandler { _, throwable ->
-                        Log.d("TAG", "ERROR- ${throwable.message}")
-                    }
+                        val result1 = job1.await()
+                        if (result1.isSuccessful && result1.body() != null) {
 
-                    //testing
-//                    dialog.dismiss()
-//                    val roleDialog = ChooseRoleDialog()
-//                    roleDialog.show(supportFragmentManager,"roleDialog")
-//                    roleDialog.isCancelable=false
-
-
-                    if (NetworkUtils.isInternetAvailable(this)) {
-
-                        lifecycleScope.launch(handler) {
-
-                            if (user != null && user.phoneNumber != null) {
-
-                                val result = RetrofitHelper.userAPI.getUser(user.phoneNumber!!.substring(1))
-
-                                //user already has an account as customer
-                                if(result.isSuccessful && result.body()!=null){
-                                    dialog.dismiss()
-                                    val sharedPref =
-                                        getSharedPreferences(Constants.SHARED_PREF_NAME, Context.MODE_PRIVATE)
-
-                                    val u = result.body()!!
-                                    if(u.role == Constants.CUSTOMER_STR){
-                                        sharedPref.add(Customer(u.name,u.password,u.phone,u.address,u.id))
-                                    }else{
-                                        sharedPref.add(Retailer(u.name,u.password,u.phone,u.address,u.shopName,u.id))
-                                    }
-
-                                    startActivity(
-                                        Intent(
-                                            this@LoginActivity,
-                                            MainActivity::class.java
-                                        )
-                                    )
-                                }else{
-                                    dialog.dismiss()
-                                    val roleDialog = ChooseRoleDialog()
-                                    roleDialog.show(supportFragmentManager,"roleDialog")
-                                    roleDialog.isCancelable=false
-                                }
+                            val job2 = async {
+                                RetrofitHelper.getInstance(this@SignUpActivity)
+                                    .getUser(RetailerSignIn(null,user!!.phoneNumber!!.substring(3)))
                             }
-                        }
-                    } else {
 
-                        dialog.dismiss()
-                        Toast.makeText(
-                            this@LoginActivity,
-                            "Please make sure you have internet access",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                            val result2 = job2.await()
+                            if (result2.isSuccessful && result2.body() != null) {
+
+                                when (result2.body()!!.role) {
+                                    UserRole.Retailer -> {
+                                        PreferenceManager.getInstance(this@SignUpActivity).add(
+                                            Retailer(
+                                                result2.body()!!.name,
+                                                result2.body()!!.email,
+                                                result2.body()!!.password,
+                                                result2.body()!!.phone,
+                                                result2.body()!!.address,
+                                                result2.body()!!.businessName!!,
+                                                result2.body()!!.businessType!!,
+                                                result2.body()!!.totalSales,
+                                                result2.body()!!.id
+                                            )
+                                        )
+                                    }
+                                    UserRole.Customer -> {
+                                        PreferenceManager.getInstance(this@SignUpActivity).add(
+                                            Customer(
+                                                result2.body()!!.name,
+                                                result2.body()!!.phone,
+                                                result2.body()!!.address,
+                                                result2.body()!!.id
+                                            )
+                                        )
+                                    }
+                                }
+                                PreferenceManager.getInstance(this@SignUpActivity).saveAuthToken(result1.body()!!)
+                                dialog.dismiss()
+                                startActivity(
+                                    Intent(
+                                        this@SignUpActivity,
+                                        MainActivity::class.java
+                                    )
+                                )
+                                finish()
+                            }
+                        } else {
+                            dialog.dismiss()
+                            val roleDialog = ChooseRoleDialog()
+                            roleDialog.show(supportFragmentManager, "roleDialog")
+                            roleDialog.isCancelable = false
+                        }
+
                     }
+
 
                 } else {
                     dialog.dismiss()

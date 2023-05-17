@@ -52,19 +52,6 @@ class AddCustomerDialog : BottomSheetDialogFragment() {
                 loadingDialog.isCancelable = false
                 loadingDialog.show(requireActivity().supportFragmentManager,"loading")
                 val phone = binding.editTextSearch.text?.toString()!!
-                lifecycleScope.launch {
-                    val result = RetrofitHelper.userAPI.isCustomer(phone)
-                    if(result.isSuccessful && result.body()!=null){
-
-                        loadingDialog.dismiss()
-                        viewmodel.addCustomer(result.body()!!)
-                        Toast.makeText(requireActivity(),"Customer Added!",Toast.LENGTH_SHORT).show()
-                    }else{
-                        loadingDialog.dismiss()
-                        Toast.makeText(requireActivity(),"Customer not found!",Toast.LENGTH_SHORT).show()
-                    }
-
-                }
                 return@setOnEditorActionListener true
             }
         }

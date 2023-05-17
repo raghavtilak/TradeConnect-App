@@ -1,17 +1,18 @@
 package com.raghav.digitalpaymentsbook.util
 
+import android.content.Context
+import android.util.Log
 import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
 import java.security.KeyStore
 import java.security.SecureRandom
-import javax.net.ssl.HostnameVerifier
-import javax.net.ssl.SSLContext
-import javax.net.ssl.TrustManager
-import javax.net.ssl.TrustManagerFactory
-import javax.net.ssl.X509TrustManager
+import javax.net.ssl.*
 
-object UnsafeOkHttpClient {
+class UnsafeOkHttpClient(val context: Context) {
 
-    fun getUnsafeOkHttpClient(): OkHttpClient? {
+    public fun getUnsafeOkHttpClient(): OkHttpClient? {
+        Log.d("TAG","getUnsafeOkHttpClient")
         return try {
             // Create a trust manager that does not validate certificate chains
             val trustAllCerts = arrayOf<TrustManager>(
@@ -57,9 +58,41 @@ object UnsafeOkHttpClient {
 
 
             val builder = OkHttpClient.Builder()
+            builder.addInterceptor(AuthInterceptor(context))
+            builder.addNetworkInterceptor { chain->
+
+                val request: Request = chain.request()
+
+                val t1 = System.nanoTime()
+                Log.d("TAG",
+                    java.lang.String.format(
+                        "Sending request %s on %s%n%s",
+                        request.url(), chain.connection(), request.headers()
+                    )
+                )
+
+                val response: Response = chain.proceed(request)
+
+                val t2 = System.nanoTime()
+                Log.d("TAG",
+                    java.lang.String.format(
+                        "Received response for %s in %.1fms%n%s",
+                        response.request().url(), (t2 - t1) / 1e6, response.headers()
+                    )
+                )
+
+                response;
+
+            }
             builder.sslSocketFactory(sslSocketFactory, trustManager)
             builder.hostnameVerifier(HostnameVerifier { _, _ -> true })
+
+            Log.d("TAG","getUnsafeOkHttpClient 2")
+
+
             builder.build()
+
+
         } catch (e: Exception) {
             throw RuntimeException(e)
         }

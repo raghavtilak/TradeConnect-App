@@ -10,6 +10,7 @@
         android:id="@+id/customerLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:visibility="gone"
         android:background="@color/colorPrimary">
 
         <ImageView
@@ -34,10 +35,32 @@
             app:drawableEndCompat="@drawable/ic_baseline_verified_24" />
 
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/customerNameCard"
+            android:id="@+id/customerEmailCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/phoneNo"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="8dp">
+
+            <TextView
+                android:id="@+id/custEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Email"
+                android:textSize="17sp"
+                android:padding="20dp"/>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/customerNameCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/customerEmailCard"
             android:layout_marginStart="20dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="20dp"
@@ -117,25 +140,19 @@
             app:cardBackgroundColor="@color/colorSecondaryDark"
             app:cardCornerRadius="10dp">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_margin="12dp">
-
                 <TextView
+                    android:padding="12dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Create Account"
                     android:textColor="@color/white"
                     android:textSize="18sp" />
-            </LinearLayout>
         </androidx.cardview.widget.CardView>
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/retailerLayout"
-        android:visibility="gone"
+        android:visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/colorPrimary">
@@ -162,10 +179,31 @@
             app:drawableEndCompat="@drawable/ic_baseline_verified_24" />
 
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/retailerNameCard"
+            android:id="@+id/retailerEmailCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/retphoneNo"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="8dp">
+
+            <TextView
+                android:id="@+id/retEmail"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Email"
+                android:textSize="17sp"
+                android:padding="20dp"/>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/retailerNameCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/retailerEmailCard"
             android:layout_marginStart="20dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="20dp"
@@ -268,6 +306,25 @@
 
 
         </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/retailerUpiCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/retaddressCard"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="20dp"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="8dp">
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/busType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </com.google.android.material.card.MaterialCardView>
+
         <androidx.cardview.widget.CardView
             android:id="@+id/retcreateBtn"
             android:layout_width="wrap_content"
@@ -279,19 +336,13 @@
             app:cardBackgroundColor="@color/colorSecondaryDark"
             app:cardCornerRadius="10dp">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_margin="12dp">
-
                 <TextView
+                    android:padding="12dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Create Account"
                     android:textColor="@color/white"
                     android:textSize="18sp" />
-            </LinearLayout>
         </androidx.cardview.widget.CardView>
     </RelativeLayout>
 

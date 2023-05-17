@@ -36,7 +36,7 @@ class SettledTransactionsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         viewmodel = ViewModelProvider(requireActivity())[TransactionViewmodel::class.java]
-        val adapter = TransactionsAdapter()
+        val adapter = TransactionsAdapter(true)
         viewmodel.settledList.observe(requireActivity()){
             adapter.submitList(it.toMutableList())
         }
@@ -44,15 +44,6 @@ class SettledTransactionsFragment : Fragment() {
         binding.recyclerView.layoutManager = LinearLayoutManager(requireActivity())
         binding.recyclerView.adapter=adapter
 
-        lifecycleScope.launch {
-            val result = RetrofitHelper.userAPI.getAllSettledTransactions(viewmodel.customer!!.id,viewmodel.retailer!!.id)
-            if(result.isSuccessful && result.body()!=null){
-                val list = result.body()!!
-                viewmodel.settledList.value = list.toMutableList()
-            }else{
-                Toast.makeText(requireActivity(),"Some error occurred", Toast.LENGTH_SHORT).show()
-            }
-        }
 
     }
 

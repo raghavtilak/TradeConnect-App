@@ -14,7 +14,7 @@ class CustomerAdapter(private val onItemClickListener: OnItemClickListener) : Li
 
     companion object COMPARATOR : DiffUtil.ItemCallback<Customer>(){
         override fun areItemsTheSame(oldItem: Customer, newItem: Customer): Boolean {
-            return oldItem.id == newItem.id
+            return oldItem.customerPhone == newItem.customerPhone
         }
 
         override fun areContentsTheSame(oldItem: Customer, newItem: Customer): Boolean {
@@ -32,12 +32,12 @@ class CustomerAdapter(private val onItemClickListener: OnItemClickListener) : Li
 
         holder.binding.apply {
             val c = currentList[holder.adapterPosition]
-            name.text = c.name
-            phone.text = c.phone
-            avatarText.text = if(c.name.contains(" "))
-                "${c.name.split(" ")[0][0]}${c.name.split(" ")[1][0]}"
+            name.text = c.customerName
+            phone.text = c.customerPhone.toString()
+            avatarText.text = if(c.customerName.contains(" "))
+                "${c.customerName.split(" ")[0][0]}${c.customerName.split(" ")[1][0]}"
             else
-                c.name[0].toString()
+                c.customerName[0].toString()
             root.setOnClickListener {
                 onItemClickListener.onItemClick(c)
             }
