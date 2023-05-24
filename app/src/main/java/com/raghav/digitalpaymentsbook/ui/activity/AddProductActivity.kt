@@ -151,8 +151,8 @@ class AddProductActivity : AppCompatActivity(), ProductAdapter.OnRemoveClickList
                 lifecycleScope.launch(handler) {
                     val result =
                         RetrofitHelper.getInstance(this@AddProductActivity).getUser(
-                            RetailerSignIn(null, "${binding.editTextCustomerPhone.text!!}".substring(3))
-                            )
+                            null, "${binding.editTextCustomerPhone.text!!}".substring(3))
+
 
                     if (result.isSuccessful && result.body() != null) {
                         Log.d("TAG", "got response= ${result.body()}")

@@ -25,10 +25,7 @@ import com.raghav.digitalpaymentsbook.data.model.enums.UserRole
 import com.raghav.digitalpaymentsbook.data.network.RetrofitHelper
 import com.raghav.digitalpaymentsbook.databinding.ActivityCreateUserBinding
 import com.raghav.digitalpaymentsbook.ui.dialog.LoadingDialog
-import com.raghav.digitalpaymentsbook.util.Constants
-import com.raghav.digitalpaymentsbook.util.PreferenceManager
-import com.raghav.digitalpaymentsbook.util.add
-import com.raghav.digitalpaymentsbook.util.saveAuthToken
+import com.raghav.digitalpaymentsbook.util.*
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -139,7 +136,7 @@ class CreateUserActivity : AppCompatActivity() {
                         val job2 =
                             async {
                                 RetrofitHelper.getInstance(this@CreateUserActivity)
-                                    .getUser(RetailerSignIn(null,user.phoneNumber!!.substring(3)))
+                                    .getUser(null,user.phoneNumber!!.substring(3))
                             }
                         val result2 = job2.await()
                         if (result2.isSuccessful && result2.body() != null) {
@@ -272,7 +269,7 @@ class CreateUserActivity : AppCompatActivity() {
                 val email = user.email
                 val password = user.uid
                 val phone = user.phoneNumber!!.substring(3)
-                val busType = (binding.busType.selectedItem as BusinessTypes).id
+                val busType = (binding.busType.selectedItem as BusinessTypes).id.toHexString()
                 val r =
                     User(
                         name,
@@ -296,7 +293,7 @@ class CreateUserActivity : AppCompatActivity() {
 
                         val job2 = async {
                             RetrofitHelper.getInstance(this@CreateUserActivity)
-                                .getUser(RetailerSignIn(null,user.phoneNumber!!.substring(3)))
+                                .getUser(null,user.phoneNumber!!.substring(3))
                         }
 
                         val result2 = job2.await()

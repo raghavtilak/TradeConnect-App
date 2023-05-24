@@ -24,7 +24,7 @@ class RetrofitHelper {
 
     companion object : SingletonHolder<UserAPI,Context>({
         Retrofit.Builder()
-            .baseUrl("https://8fc8-157-38-50-23.ngrok-free.app/api/v1/")
+            .baseUrl("https://1f27-157-38-60-9.ngrok-free.app/api/v1/")
             .client(UnsafeOkHttpClient(it).getUnsafeOkHttpClient())
             .addConverterFactory(GsonConverterFactory.create(GsonUtils.gson))
             .build().create(UserAPI::class.java)

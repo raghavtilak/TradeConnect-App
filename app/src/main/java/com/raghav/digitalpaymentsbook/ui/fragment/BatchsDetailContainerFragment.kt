@@ -44,7 +44,7 @@ class BatchsDetailContainerFragment : BottomSheetDialogFragment() {
             binding.viewpager.offscreenPageLimit = 5
 
             TabLayoutMediator(binding.tabLayout, binding.viewpager) { tab, position ->
-                tab.text = "Batch $position"
+                tab.text = "Batch ${position+1}"
             }.attach()
 
         }

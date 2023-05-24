@@ -13,7 +13,7 @@ data class Retailer(
     val phone: String,
     val address: String,
     val businessName: String,
-    val businessType:ObjectId,
+    val businessType:String,
     val totalSales:Int,
     @SerializedName("_id")
     val id: ObjectId

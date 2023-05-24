@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.lifecycleScope
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.raghav.digitalpaymentsbook.R
 import com.raghav.digitalpaymentsbook.adapter.RetailerAdapter
+import com.raghav.digitalpaymentsbook.data.model.apis.CreateConnection
 import com.raghav.digitalpaymentsbook.data.network.RetrofitHelper
 import com.raghav.digitalpaymentsbook.databinding.FragmentAddConnectionBinding
 import com.raghav.digitalpaymentsbook.databinding.FragmentConnectionsBinding
@@ -47,12 +49,18 @@ class AddConnectionFragment : BottomSheetDialogFragment() {
         bottomSheet.backgroundTintMode = PorterDuff.Mode.CLEAR
         bottomSheet.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
         bottomSheet.setBackgroundColor(Color.TRANSPARENT)
+
+        this.dialog?.window?.setSoftInputMode(
+            WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE or
+                WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+
         binding.recyclerview.layoutManager = LinearLayoutManager(requireActivity())
 
         val adapter = RetailerAdapter{
 
             viewLifecycleOwner.lifecycleScope.launch {
-                val job = async { RetrofitHelper.getInstance(requireActivity()).createConnectionRequest(GsonUtils.gson.toJson(it.id)) }
+                val job = async { RetrofitHelper.getInstance(requireActivity()).createConnectionRequest(
+                    CreateConnection(it.id,"none")) }
                 val res = job.await()
                 if(res.isSuccessful && res.body()!=null){
                     Toast.makeText(requireActivity(), res.message(), Toast.LENGTH_SHORT).show()

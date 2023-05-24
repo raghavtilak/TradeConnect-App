@@ -7,8 +7,8 @@ import org.bson.types.ObjectId
 
 @Parcelize
 data class Connection(
-    @SerializedName("_id")
-    val id: ObjectId?,
+    @SerializedName("id")
+    val id: ObjectId,
     val isCreatedByUser: Boolean,
     val user: Retailer,
-) : Parcelable {}
+) : Parcelable

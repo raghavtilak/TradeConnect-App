@@ -5,6 +5,7 @@ import android.util.Log
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import okio.Buffer
 import java.security.KeyStore
 import java.security.SecureRandom
 import javax.net.ssl.*
@@ -66,8 +67,8 @@ class UnsafeOkHttpClient(val context: Context) {
                 val t1 = System.nanoTime()
                 Log.d("TAG",
                     java.lang.String.format(
-                        "Sending request %s on %s%n%s",
-                        request.url(), chain.connection(), request.headers()
+                        "Sending request %s on %s%n%s Body: %s",
+                        request.url, chain.connection(), request.headers, bodyToString(request)
                     )
                 )
 
@@ -76,8 +77,13 @@ class UnsafeOkHttpClient(val context: Context) {
                 val t2 = System.nanoTime()
                 Log.d("TAG",
                     java.lang.String.format(
-                        "Received response for %s in %.1fms%n%s",
-                        response.request().url(), (t2 - t1) / 1e6, response.headers()
+                        "Received response for %s in %.1fms%n%s Response-Body: %s",
+                        response.request.url, (t2 - t1) / 1e6, response.headers,
+                        response.peekBody(2048).string()
+
+                        //don't use below thing as it will close the body to be consumed anywhere else,
+                        // instead use above thing , response.peekBody
+                        //response.body()?.string()
                     )
                 )
 
@@ -95,6 +101,17 @@ class UnsafeOkHttpClient(val context: Context) {
 
         } catch (e: Exception) {
             throw RuntimeException(e)
+        }
+    }
+
+    private fun bodyToString(request: Request): String? {
+        return try {
+            val copy = request.newBuilder().build()
+            val buffer = Buffer()
+            copy.body!!.writeTo(buffer)
+            buffer.readUtf8()
+        } catch (e: Exception) {
+            "Body is empty. or maybe some error"
         }
     }
 

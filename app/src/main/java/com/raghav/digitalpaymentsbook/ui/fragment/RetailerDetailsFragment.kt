@@ -16,6 +16,7 @@ import com.raghav.digitalpaymentsbook.databinding.FragmentRetailerDetailsBinding
 class RetailerDetailsFragment(
     val retailer: Retailer,
     val status: ConnectionStatus,
+    val isCreatedByUser:  Boolean,
     val onUpdateStatus: (status: ConnectionStatus) -> Unit
 ) : BottomSheetDialogFragment() {
 
@@ -23,6 +24,7 @@ class RetailerDetailsFragment(
     val binding: FragmentRetailerDetailsBinding
         get() = _binding!!
 
+    constructor(retailer: Retailer):this(retailer,ConnectionStatus.accepted,true,{})
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,10 +41,13 @@ class RetailerDetailsFragment(
         bottomSheet.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
         bottomSheet.setBackgroundColor(Color.TRANSPARENT)
 
+        binding.accept.isVisible = !isCreatedByUser
+        binding.decline.isVisible = !isCreatedByUser
+
         binding.name.text = "Name:${retailer.name}"
         binding.email.text = "Email:${retailer.email}"
         binding.phone.text = "Phone:${retailer.phone}"
-        binding.address.text = "Adress:${retailer.address}"
+        binding.address.text = "Address:${retailer.address}"
         binding.businessName.text = "Business Name:${retailer.businessName}"
 
         if (status != ConnectionStatus.pending){

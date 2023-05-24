@@ -32,6 +32,7 @@ class RetailerAdapter(private val onItemClickListener: (retailer: Retailer)->Uni
 
         holder.binding.apply {
             val c = currentList[holder.adapterPosition]
+
             retailerName.text = c.name
             businessName.text = c.businessName
             phone.text = c.phone

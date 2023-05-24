@@ -1,5 +1,6 @@
 package com.raghav.digitalpaymentsbook.ui.fragment
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -29,19 +30,22 @@ class BatchDetailFragment : Fragment() {
         return binding.root
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         batch = arguments?.getParcelable("batch")
 
         batch?.let {
-            binding.batchNo.text = "Btach No: ₹${it.batchNo}"
+
+
+            binding.batchNo.text = "Batch No: ₹${it.batchNo}"
             binding.mrp.text = "MRP: ₹${it.MRP}"
-            binding.mfgdate.text = "Mfg: ${SimpleDateFormat("dd/MM/yyyy").format(it.mfg)}"
-            binding.expdate.text = "Exp: ${SimpleDateFormat("dd/MM/yyyy").format(it.expiry)}"
+            it.mfg?.let { mfg-> binding.mfgdate.text = "Mfg: ${SimpleDateFormat("dd/MM/yyyy").format(mfg)}"}
+            it.expiry?.let { expdate->binding.expdate.text = "Exp: ${SimpleDateFormat("dd/MM/yyyy").format(expdate)}"}
             binding.productName.text = "Product Name: ${it.productName}"
             binding.quantity.text = "Quantity: ${it.quantity}"
-            binding.buyPrice.text = "Buy Price: ₹${it.buyingPrice}"
+            it.buyingPrice?.let { buyPrice->binding.buyPrice.text = "Buy Price: ₹${buyPrice}"}
             binding.sellPrice.text = "Sell Price: ₹${it.sellingPrice}"
 
         }

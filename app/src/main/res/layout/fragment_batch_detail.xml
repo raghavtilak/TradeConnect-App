@@ -44,7 +44,7 @@
         android:textSize="18sp"
         android:layout_marginTop="5dp"
         android:layout_weight="1"
-        android:text="Mfg Date" />
+        />
     <TextView
         android:id="@+id/expdate"
         android:layout_width="match_parent"
@@ -52,8 +52,7 @@
         android:textColor="@color/white"
         android:textSize="18sp"
         android:layout_marginTop="5dp"
-        android:layout_weight="1"
-        android:text="Exp Date" />
+        android:layout_weight="1"/>
     </LinearLayout>
     <TextView
         android:id="@+id/quantity"
@@ -68,24 +67,25 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
+
         <TextView
             android:id="@+id/sellPrice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-        android:layout_marginTop="5dp"
+            android:layout_marginTop="5dp"
             android:layout_weight="1"
-            android:text="Sell Price" />
+            android:text="Sell Price"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
+
         <TextView
             android:id="@+id/buyPrice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-        android:layout_marginTop="5dp"
+            android:layout_marginTop="5dp"
             android:layout_weight="1"
-            android:text="Buy Price" />
+            android:textColor="@color/white"
+            android:textSize="18sp" />
     </LinearLayout>
 
 

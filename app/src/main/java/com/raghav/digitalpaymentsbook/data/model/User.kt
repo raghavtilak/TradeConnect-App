@@ -16,7 +16,7 @@ data class User(
     val address: String,
     val role: UserRole,
     val businessName: String?,
-    val businessType:ObjectId?,
+    val businessType:String?,
     val totalSales:Int,
     @SerializedName("_id")
     val id: ObjectId

@@ -33,7 +33,7 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
-    buildFeatures{
+    buildFeatures {
         viewBinding true
     }
 }
@@ -46,9 +46,13 @@ dependencies {
 
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
+
 
     implementation platform('com.google.firebase:firebase-bom:31.1.0')
     implementation 'com.google.firebase:firebase-auth-ktx'
+    implementation 'com.google.firebase:firebase-messaging'
+
     implementation 'com.google.android.gms:play-services-auth:20.5.0'
 
 
@@ -58,18 +62,14 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.5.1"
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
-    //user circular avatar
-    implementation "xyz.schwaab:avvylib:1.2.0"
 
     implementation 'org.mongodb:bson:4.9.0'
 
-    implementation 'dev.shreyaspatil.EasyUpiPayment:EasyUpiPayment:3.0.3'
-
     // https://mvnrepository.com/artifact/org.apache.poi/poi
+    implementation 'org.apache.poi:poi-ooxml:5.2.3'
     implementation 'org.apache.poi:poi:5.2.3'
 
 
-    //for saving jwt token
-    implementation "androidx.datastore:datastore-preferences:1.0.0"
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01"
 
 }

@@ -91,7 +91,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="20dp"
             android:elevation="8dp"
-            app:cardBackgroundColor="@color/colorSecondaryDark"
+            app:cardBackgroundColor="#243043"
             app:cardCornerRadius="10dp">
 
             <TextView
@@ -100,7 +100,6 @@
                 android:layout_height="wrap_content"
                 android:text="Decline"
                 android:layout_gravity="center_horizontal"
-
                 android:textColor="@color/white"
                 android:textSize="18sp" />
         </androidx.cardview.widget.CardView>

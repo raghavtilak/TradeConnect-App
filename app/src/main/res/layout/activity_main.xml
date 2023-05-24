@@ -45,7 +45,9 @@
             <ImageView
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:src="@drawable/ic_baseline_store_24" />
+                android:layout_marginBottom="10dp"
+                android:src="@drawable/ic_outline_store_24"
+                app:tint="@color/colorSecondary" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -81,12 +83,14 @@
             <ImageView
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:src="@drawable/ic_baseline_store_24" />
+                android:layout_marginBottom="10dp"
+                android:src="@drawable/ic_my_orders"
+                app:tint="@color/colorSecondary" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="My Order"
+                android:text="My Orders"
                 android:textAlignment="center"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
@@ -117,7 +121,9 @@
             <ImageView
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:src="@drawable/ic_baseline_store_24" />
+                android:layout_marginBottom="10dp"
+                android:src="@drawable/ic_my_sells"
+                app:tint="@color/colorSecondary" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -153,7 +159,9 @@
             <ImageView
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:src="@drawable/ic_baseline_store_24" />
+                android:layout_marginBottom="10dp"
+                android:src="@drawable/ic_my_connections"
+                app:tint="@color/colorSecondary" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -180,7 +188,8 @@
     <!--        <ImageView-->
     <!--            android:layout_width="wrap_content"-->
     <!--            android:layout_height="wrap_content"-->
-    <!--            android:src="@drawable/ic_baseline_store_24"-->
+    <!--            android:src="@drawable/ic_baseline_store_24"
+                app:tint="@color/colorSecondary"-->
     <!--            android:padding="10dp"/>-->
 
     <!--    </androidx.cardview.widget.CardView>-->

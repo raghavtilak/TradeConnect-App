@@ -27,6 +27,7 @@ import com.raghav.digitalpaymentsbook.ui.dialog.LoadingDialog
 import com.raghav.digitalpaymentsbook.util.PreferenceManager
 import com.raghav.digitalpaymentsbook.util.add
 import com.raghav.digitalpaymentsbook.util.saveAuthToken
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -91,6 +92,9 @@ class SignInActivity : AppCompatActivity() {
         }
     }
     val loadingDialog = LoadingDialog()
+
+    val handler = CoroutineExceptionHandler { _, throwable -> Log.d("TAG","ERROR=${throwable.message}") }
+
 
     val gsignLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
         val task = GoogleSignIn.getSignedInAccountFromIntent(it.data)
@@ -214,7 +218,7 @@ class SignInActivity : AppCompatActivity() {
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
                     val user = mAuth!!.currentUser
-                    lifecycleScope.launch {
+                    lifecycleScope.launch(handler) {
                         userServerSignIn(this,RetailerSignIn(user!!.email, null))
                     }
                 } else {
@@ -237,16 +241,23 @@ class SignInActivity : AppCompatActivity() {
             )
         }
 
+
         val result1 = job1.await()
+
+        Log.d("TAG","GG 1")
+
         if (result1.isSuccessful && result1.body() != null) {
 
             val job2 = scope.async {
                 RetrofitHelper.getInstance(this@SignInActivity)
-                    .getUser(retailerSignIn)
+                    .getUser(retailerSignIn.phone,retailerSignIn.email)
             }
 
+            Log.d("TAG","GG 2")
             val result2 = job2.await()
             if (result2.isSuccessful && result2.body() != null) {
+
+                Log.d("TAG","GG 3")
 
                 when (result2.body()!!.role) {
                     UserRole.Retailer -> {
@@ -290,7 +301,7 @@ class SignInActivity : AppCompatActivity() {
 //            auth.signOut()
             auth.currentUser?.delete()?.addOnCompleteListener {
                 loadingDialog.dismiss()
-                Toast.makeText(this@SignInActivity, "User with this phone does not exist.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@SignInActivity, "User with this does not exist.", Toast.LENGTH_SHORT).show()
             }
         }
 

@@ -163,7 +163,7 @@ class SignUpActivity : AppCompatActivity() {
 
                             val job2 = async {
                                 RetrofitHelper.getInstance(this@SignUpActivity)
-                                    .getUser(RetailerSignIn(null,user!!.phoneNumber!!.substring(3)))
+                                    .getUser(null,user!!.phoneNumber!!.substring(3))
                             }
 
                             val result2 = job2.await()
