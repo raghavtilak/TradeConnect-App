@@ -15,6 +15,7 @@ data class Retailer(
     val businessName: String,
     val businessType:String,
     val totalSales:Int,
+    val fcmToken: String?,
     @SerializedName("_id")
     val id: ObjectId
 ) : Parcelable

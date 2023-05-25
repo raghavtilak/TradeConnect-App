@@ -3,6 +3,7 @@ package com.raghav.digitalpaymentsbook.ui.activity
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.*
+import com.google.firebase.messaging.FirebaseMessaging
 import com.raghav.digitalpaymentsbook.data.model.Customer
 import com.raghav.digitalpaymentsbook.data.model.Retailer
 import com.raghav.digitalpaymentsbook.data.model.apis.RetailerSignIn
@@ -181,6 +183,7 @@ class SignUpActivity : AppCompatActivity() {
                                                 result2.body()!!.businessName!!,
                                                 result2.body()!!.businessType!!,
                                                 result2.body()!!.totalSales,
+                                                getFcmToken(),
                                                 result2.body()!!.id
                                             )
                                         )
@@ -191,6 +194,7 @@ class SignUpActivity : AppCompatActivity() {
                                                 result2.body()!!.name,
                                                 result2.body()!!.phone,
                                                 result2.body()!!.address,
+                                                getFcmToken(),
                                                 result2.body()!!.id
                                             )
                                         )
@@ -226,4 +230,25 @@ class SignUpActivity : AppCompatActivity() {
                 }
             }
     }
+
+    private fun getFcmToken():String?{
+        var token :String? = null
+
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("TAG", "Fetching FCM registration token failed", task.exception)
+
+                return@addOnCompleteListener
+            }
+
+            // Get new FCM registration token
+            token = task.result
+
+            // Log and toast
+            Log.d("TAG", "Got token : $token")
+
+        }
+        return token
+    }
+
 }

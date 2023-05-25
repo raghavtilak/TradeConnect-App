@@ -17,6 +17,7 @@ import com.google.android.gms.common.api.ApiException
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
 import com.google.firebase.auth.*
+import com.google.firebase.messaging.FirebaseMessaging
 import com.raghav.digitalpaymentsbook.data.model.Customer
 import com.raghav.digitalpaymentsbook.data.model.Retailer
 import com.raghav.digitalpaymentsbook.data.model.apis.RetailerSignIn
@@ -231,7 +232,7 @@ class SignInActivity : AppCompatActivity() {
             }
     }
 
-    suspend fun userServerSignIn(scope: CoroutineScope,retailerSignIn: RetailerSignIn){
+    private suspend fun userServerSignIn(scope: CoroutineScope, retailerSignIn: RetailerSignIn){
 
 
         //dumping '+91' from the user phone number
@@ -271,6 +272,7 @@ class SignInActivity : AppCompatActivity() {
                                 result2.body()!!.businessName!!,
                                 result2.body()!!.businessType!!,
                                 result2.body()!!.totalSales,
+                                getFcmToken(),
                                 result2.body()!!.id
                             )
                         )
@@ -281,6 +283,7 @@ class SignInActivity : AppCompatActivity() {
                                 result2.body()!!.name,
                                 result2.body()!!.phone,
                                 result2.body()!!.address,
+                                getFcmToken(),
                                 result2.body()!!.id
                             )
                         )
@@ -305,6 +308,27 @@ class SignInActivity : AppCompatActivity() {
             }
         }
 
+    }
+
+
+    private fun getFcmToken():String?{
+        var token :String? = null
+
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("TAG", "Fetching FCM registration token failed", task.exception)
+
+                return@addOnCompleteListener
+            }
+
+            // Get new FCM registration token
+            token = task.result
+
+            // Log and toast
+            Log.d("TAG", "Got token : $token")
+
+        }
+        return token
     }
 
 

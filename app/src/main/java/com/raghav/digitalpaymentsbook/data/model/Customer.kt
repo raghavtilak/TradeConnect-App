@@ -11,6 +11,7 @@ data class Customer(
 //    val password: String?,
     val customerPhone: String,
     val customerAddress: String?,
+    val fcmToken: String?,
     @SerializedName("_id")
     val id: ObjectId?
 ) : Parcelable

@@ -1,11 +1,18 @@
 package com.raghav.digitalpaymentsbook.ui.activity
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.messaging.FirebaseMessaging
 import com.raghav.digitalpaymentsbook.data.model.enums.UserRole
 import com.raghav.digitalpaymentsbook.databinding.ActivityMainBinding
 import com.raghav.digitalpaymentsbook.ui.viewmodel.MainViewmodel
@@ -19,9 +26,20 @@ class MainActivity : AppCompatActivity() {
 //    RetailerAdapter.OnItemClickListener {
 
     lateinit var binding: ActivityMainBinding
-    lateinit var viewModel: MainViewmodel
-
-
+    // Declare the launcher at the top of your Activity/Fragment:
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            // FCM SDK (and your app) can post notifications.
+        } else {
+            Toast.makeText(
+                this,
+                "This permission is required to get notifications for orders and connection requests",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,10 +95,36 @@ class MainActivity : AppCompatActivity() {
                     startActivity(Intent(this@MainActivity, MyConnectionsActivity::class.java))
 
                 }
+                binding.profile.setOnClickListener {
+                    startActivity(Intent(this@MainActivity, ProfileActivity::class.java))
 
+                }
+
+                askNotificationPermission()
+                getFcmToken()
             }
 
         }
+
+    private fun askNotificationPermission() {
+        // This is only necessary for API level >= 33 (TIRAMISU)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
+                PackageManager.PERMISSION_GRANTED
+            ) {
+                // FCM SDK (and your app) can post notifications.
+            } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+                Toast.makeText(
+                    this,
+                    "This permission is required to get notifications for orders and connection requests",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                // Directly ask for the permission
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
 
 
 /*
@@ -172,5 +216,27 @@ class MainActivity : AppCompatActivity() {
     }
 
 */
+
+
+    private fun getFcmToken():String?{
+        var token :String? = null
+
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("TAG", "Fetching FCM registration token failed", task.exception)
+
+                return@addOnCompleteListener
+            }
+
+            // Get new FCM registration token
+            token = task.result
+
+            // Log and toast
+            Log.d("TAG", "Got token : $token")
+
+        }
+        return token
+    }
+
 
 }

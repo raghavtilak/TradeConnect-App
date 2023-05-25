@@ -79,6 +79,9 @@ interface UserAPI {
     @GET("retailer/{batchNo}/get_batch_by_no")
     suspend fun findBatch(@Path("batchNo") batchNo:String):Response<Batch>
 
+    @POST("retailer/update_token")
+    suspend fun updateNotificationToken(@Body token: RequestBody):Response<ServerResponse>
+
 
     @POST("retailer/add_batch_to_inventory")
     suspend fun addBatchToInventory(@Body batch: RequestBody):Response<ServerResponse>

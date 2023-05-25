@@ -7,36 +7,69 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.util.Log
+import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.TaskStackBuilder
-import androidx.core.content.ContextCompat.getSystemService
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.raghav.digitalpaymentsbook.data.network.RetrofitHelper
 import com.raghav.digitalpaymentsbook.ui.activity.MainActivity
+import com.raghav.digitalpaymentsbook.ui.activity.MyInvitationsActivity
+import com.raghav.digitalpaymentsbook.ui.activity.MyOrderActivity
+import com.raghav.digitalpaymentsbook.ui.activity.PendingOrdersActivity
+import com.raghav.digitalpaymentsbook.util.Constants
+import com.raghav.digitalpaymentsbook.util.PreferenceManager
+import com.raghav.digitalpaymentsbook.util.getAuthToken
+import kotlinx.coroutines.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
 
 class PushNotificationService : FirebaseMessagingService() {
+
+    private val job = Job()
+    private val ioScope = CoroutineScope(Dispatchers.IO + job)
+
     override fun onMessageReceived(message: RemoteMessage) {
         val title = message.notification!!.title
         val text = message.notification!!.body
         var link: String? = null
-        if (message.data.size > 0 && message.data.containsKey("link")) {
+        if (message.data.isNotEmpty() && message.data.containsKey("link")) {
             link = message.data["link"]
+            createNotification(title, text, link,"link")
+        }else if(message.data.isNotEmpty() && message.data.containsKey("order")){
+            createNotification(title, text, link,"order")
+        }else if(message.data.isNotEmpty() && message.data.containsKey("connection")){
+            createNotification(title, text, link,"connection")
+        }else{
+            createNotification(title, text, link,"none")
         }
-        createNotification(title, text, link)
         super.onMessageReceived(message)
     }
 
-    fun createNotification(title: String?, text: String?, link: String?) {
+    private fun createNotification(title: String?, text: String?, link: String?,type: String) {
 
         // Create an Intent for the activity you want to start
 //        Intent resultIntent = new Intent(this, MainActivity.class);
         val resultIntent: Intent
-        if (link != null) {
-            resultIntent = Intent(Intent.ACTION_VIEW)
-            resultIntent.data = Uri.parse(link)
-        } else {
-            resultIntent = Intent(this, MainActivity::class.java)
+
+        when (type) {
+            "link" -> {
+                resultIntent = Intent(Intent.ACTION_VIEW)
+                resultIntent.data = Uri.parse(link)
+            }
+            "order" -> {
+                resultIntent = Intent(this, PendingOrdersActivity::class.java)
+            }
+            "connection" -> {
+                resultIntent = Intent(this, MyInvitationsActivity::class.java)
+            }
+            else -> {
+                resultIntent = Intent(this, MainActivity::class.java)
+            }
         }
+
         val stackBuilder = TaskStackBuilder.create(this)
         stackBuilder.addNextIntentWithParentStack(resultIntent)
         val resultPendingIntent = stackBuilder.getPendingIntent(
@@ -72,4 +105,47 @@ class PushNotificationService : FirebaseMessagingService() {
             notificationManager.notify(1, notificationPopup)
         }
     }
+
+    /**
+     * Called if the FCM registration token is updated. This may occur if the security of
+     * the previous token had been compromised. Note that this is called when the
+     * FCM registration token is initially generated so this is where you would retrieve the token.
+     */
+    override fun onNewToken(token: String) {
+        Log.d("TAG", "Refreshed token: $token")
+
+        // If you want to send messages to this application instance or
+        // manage this apps subscriptions on the server side, send the
+        // FCM registration token to your app server.
+
+        if(PreferenceManager.getInstance(this).getAuthToken()!="") {
+
+            val jo = JSONObject()
+            jo.put("token", token)
+
+            val body =
+                jo.toString().toRequestBody("application/json".toMediaTypeOrNull())
+
+
+            ioScope.launch {
+                val job = async {
+                    RetrofitHelper.getInstance(this@PushNotificationService)
+                        .updateNotificationToken(body)
+                }
+                val res = job.await()
+                if (res.isSuccessful && res.body() != null) {
+                    Log.d("TAG", "Updated token")
+                } else {
+                    Log.d("TAG", "Can't update token")
+                }
+            }
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        job.cancel("Service destroyed")
+        ioScope.cancel("Service destroyed")
+    }
+
 }

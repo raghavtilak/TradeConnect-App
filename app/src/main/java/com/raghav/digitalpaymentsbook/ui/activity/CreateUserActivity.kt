@@ -13,19 +13,22 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.messaging.FirebaseMessaging
 import com.raghav.digitalpaymentsbook.R
 import com.raghav.digitalpaymentsbook.data.model.Customer
 import com.raghav.digitalpaymentsbook.data.model.Retailer
 import com.raghav.digitalpaymentsbook.data.model.User
-import com.raghav.digitalpaymentsbook.data.model.apis.RetailerSignIn
 import com.raghav.digitalpaymentsbook.data.model.enums.BusinessTypes
 import com.raghav.digitalpaymentsbook.data.model.enums.UserRole
 import com.raghav.digitalpaymentsbook.data.network.RetrofitHelper
 import com.raghav.digitalpaymentsbook.databinding.ActivityCreateUserBinding
 import com.raghav.digitalpaymentsbook.ui.dialog.LoadingDialog
-import com.raghav.digitalpaymentsbook.util.*
+import com.raghav.digitalpaymentsbook.util.PreferenceManager
+import com.raghav.digitalpaymentsbook.util.add
+import com.raghav.digitalpaymentsbook.util.saveAuthToken
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -111,6 +114,7 @@ class CreateUserActivity : AppCompatActivity() {
                 val c = User(
                     name,
                     email!!,
+                    getFcmToken(),
                     password,
                     phone,
                     address,
@@ -136,17 +140,19 @@ class CreateUserActivity : AppCompatActivity() {
                         val job2 =
                             async {
                                 RetrofitHelper.getInstance(this@CreateUserActivity)
-                                    .getUser(null,user.phoneNumber!!.substring(3))
+                                    .getUser(null, user.phoneNumber!!.substring(3))
                             }
                         val result2 = job2.await()
                         if (result2.isSuccessful && result2.body() != null) {
                             dialog.dismiss()
-                            PreferenceManager.getInstance(this@CreateUserActivity).saveAuthToken(result1.body()!!)
+                            PreferenceManager.getInstance(this@CreateUserActivity)
+                                .saveAuthToken(result1.body()!!)
                             PreferenceManager.getInstance(this@CreateUserActivity).add(
                                 Customer(
                                     result2.body()!!.name,
                                     result2.body()!!.phone,
                                     result2.body()!!.address,
+                                    getFcmToken(),
                                     result2.body()!!.id
                                 )
                             )
@@ -274,6 +280,7 @@ class CreateUserActivity : AppCompatActivity() {
                     User(
                         name,
                         email!!,
+                        getFcmToken(),
                         password,
                         phone,
                         address,
@@ -293,14 +300,15 @@ class CreateUserActivity : AppCompatActivity() {
 
                         val job2 = async {
                             RetrofitHelper.getInstance(this@CreateUserActivity)
-                                .getUser(null,user.phoneNumber!!.substring(3))
+                                .getUser(null, user.phoneNumber!!.substring(3))
                         }
 
                         val result2 = job2.await()
                         if (result2.isSuccessful && result2.body() != null) {
 
                             dialog.dismiss()
-                            PreferenceManager.getInstance(this@CreateUserActivity).saveAuthToken( result1.body()!!)
+                            PreferenceManager.getInstance(this@CreateUserActivity)
+                                .saveAuthToken(result1.body()!!)
                             PreferenceManager.getInstance(this@CreateUserActivity).add(
                                 Retailer(
                                     result2.body()!!.name,
@@ -311,8 +319,9 @@ class CreateUserActivity : AppCompatActivity() {
                                     result2.body()!!.businessName!!,
                                     result2.body()!!.businessType!!,
                                     result2.body()!!.totalSales,
+                                    getFcmToken(),
                                     result2.body()!!.id
-                            )
+                                )
                             )
                             startActivity(
                                 Intent(
@@ -336,6 +345,23 @@ class CreateUserActivity : AppCompatActivity() {
             }
         }
     }
+    private fun getFcmToken():String?{
+        var token :String? = null
 
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("TAG", "Fetching FCM registration token failed", task.exception)
 
+                return@addOnCompleteListener
+            }
+
+                // Get new FCM registration token
+                token = task.result
+
+                // Log and toast
+                Log.d("TAG", "Got token : $token")
+
+        }
+        return token
+    }
 }
