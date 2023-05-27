@@ -15,6 +15,7 @@
     <color name="black">#000000</color>
     <color name="green">#4CAF50</color>
     <color name="red">#EF5350</color>
+    <color name="darkBox">#212C3E</color>
 
 
 </resources>

@@ -263,7 +263,7 @@ class SignInActivity : AppCompatActivity() {
 
             val job2 = scope.async {
                 RetrofitHelper.getInstance(this@SignInActivity)
-                    .getUser(retailerSignIn.phone,retailerSignIn.email)
+                    .getUser(retailerSignIn.email,retailerSignIn.phone)
             }
 
             Log.d("TAG","GG 2")

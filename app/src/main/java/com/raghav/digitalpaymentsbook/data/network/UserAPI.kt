@@ -18,7 +18,7 @@ interface UserAPI {
 
 //    @FormUrlEncoded
     @GET("get_user")
-    suspend fun getUser(@Query("phone") phone : String?, @Query("email") email : String?):Response<User>
+    suspend fun getUser( @Query("email") email : String?, @Query("phone") phone : String?,):Response<User>
 
 
     @POST("retailer/signin")

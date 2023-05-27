@@ -3,6 +3,7 @@ package com.raghav.digitalpaymentsbook.ui.activity
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.Editable
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
@@ -11,6 +12,7 @@ import com.raghav.digitalpaymentsbook.data.network.RetrofitHelper
 import com.raghav.digitalpaymentsbook.databinding.ActivityAddStockBinding
 import com.raghav.digitalpaymentsbook.ui.dialog.LoadingDialog
 import com.raghav.digitalpaymentsbook.ui.fragment.DatePickerFragment
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -26,6 +28,13 @@ class AddStockActivity : AppCompatActivity() {
     lateinit var binding: ActivityAddStockBinding
 
     val loadingDialog = LoadingDialog()
+
+    val handler = CoroutineExceptionHandler { coroutineContext, throwable ->
+        Log.d(
+            "TAG",
+            "ERROR=${throwable.message} , ${throwable.printStackTrace()}"
+        )
+    }
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -103,7 +112,7 @@ class AddStockActivity : AppCompatActivity() {
         binding.searchCard.setOnClickListener {
             if (!binding.editTextBatchNo.text.isNullOrBlank()) {
                 loadingDialog.show(supportFragmentManager,"loading")
-                lifecycleScope.launch {
+                lifecycleScope.launch(handler) {
                     val job = async {
                         RetrofitHelper.getInstance(this@AddStockActivity)
                             .findBatch(binding.editTextBatchNo.text.toString())
