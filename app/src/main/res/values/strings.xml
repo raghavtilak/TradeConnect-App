@@ -5,9 +5,7 @@
     <string name="web_client_id">30979721158-6m96f8vf3bk8gvrqd3fq7pedipr24aoe.apps.googleusercontent.com</string>
 
     <string-array name="bustypesample">
-        <item>Electronics</item>
-        <item>Electronics</item>
-        <item>Electronics</item>
+        <item>Couldn\'t load business types</item>
     </string-array>
 
     <string-array name="sample">

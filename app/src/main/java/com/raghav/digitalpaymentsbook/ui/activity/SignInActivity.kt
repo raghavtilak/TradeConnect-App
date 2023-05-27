@@ -284,7 +284,7 @@ class SignInActivity : AppCompatActivity() {
                                 result2.body()!!.businessName!!,
                                 result2.body()!!.businessType!!,
                                 result2.body()!!.totalSales,
-                                getFcmToken(),
+                                result2.body()!!.registrationToken,
                                 result2.body()!!.id
                             )
                         )
@@ -295,7 +295,7 @@ class SignInActivity : AppCompatActivity() {
                                 result2.body()!!.name,
                                 result2.body()!!.phone,
                                 result2.body()!!.address,
-                                getFcmToken(),
+                                result2.body()!!.registrationToken,
                                 result2.body()!!.id
                             )
                         )

@@ -71,6 +71,7 @@ dependencies {
 
 
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4'
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01"
 

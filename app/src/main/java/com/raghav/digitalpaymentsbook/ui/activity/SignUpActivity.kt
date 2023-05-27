@@ -27,6 +27,7 @@ import com.raghav.digitalpaymentsbook.util.add
 import com.raghav.digitalpaymentsbook.util.saveAuthToken
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.util.concurrent.TimeUnit
 
 
@@ -183,7 +184,7 @@ class SignUpActivity : AppCompatActivity() {
                                                 result2.body()!!.businessName!!,
                                                 result2.body()!!.businessType!!,
                                                 result2.body()!!.totalSales,
-                                                getFcmToken(),
+                                                result2.body()!!.registrationToken,
                                                 result2.body()!!.id
                                             )
                                         )
@@ -194,7 +195,7 @@ class SignUpActivity : AppCompatActivity() {
                                                 result2.body()!!.name,
                                                 result2.body()!!.phone,
                                                 result2.body()!!.address,
-                                                getFcmToken(),
+                                                result2.body()!!.registrationToken,
                                                 result2.body()!!.id
                                             )
                                         )
@@ -243,24 +244,14 @@ class SignUpActivity : AppCompatActivity() {
             }
     }
 
-    private fun getFcmToken():String?{
-        var token :String? = null
-
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.w("TAG", "Fetching FCM registration token failed", task.exception)
-
-                return@addOnCompleteListener
-            }
-
-            // Get new FCM registration token
-            token = task.result
-
-            // Log and toast
-            Log.d("TAG", "Got token : $token")
-
+    private suspend fun getFcmToken(): String {
+        return try {
+            Log.d("TAG", "Got token : ${FirebaseMessaging.getInstance().token.await()}")
+            FirebaseMessaging.getInstance().token.await()
+        } catch (e: Exception) {
+            Log.w("TAG", "Fetching FCM registration token failed" + e.printStackTrace())
+            ""
         }
-        return token
     }
 
 }

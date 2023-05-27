@@ -101,7 +101,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 askNotificationPermission()
-                getFcmToken()
+//                getFcmToken()
             }
 
         }

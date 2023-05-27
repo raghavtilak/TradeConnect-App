@@ -13,7 +13,6 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.messaging.FirebaseMessaging
@@ -32,6 +31,7 @@ import com.raghav.digitalpaymentsbook.util.saveAuthToken
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import org.bson.types.ObjectId
 
 class CreateUserActivity : AppCompatActivity() {
@@ -39,7 +39,11 @@ class CreateUserActivity : AppCompatActivity() {
     lateinit var binding: ActivityCreateUserBinding
     val user = FirebaseAuth.getInstance().currentUser
     lateinit var gso: GoogleSignInOptions
+    val handler =
+        CoroutineExceptionHandler { _, throwable -> Log.d("TAG", "ERROR=${throwable.message}") }
 
+    val loading = LoadingDialog()
+    
     val launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         val task = GoogleSignIn.getSignedInAccountFromIntent(it.data)
         try {
@@ -48,6 +52,11 @@ class CreateUserActivity : AppCompatActivity() {
             Log.d("TAG", "firebaseAuthWithGoogle:" + account.id)
             val credential = GoogleAuthProvider.getCredential(account.idToken, null)
             val currentUser = FirebaseAuth.getInstance().currentUser
+
+            //TODO: if yha pe credentials link kr rhe hai
+            // then vps is email button par click krne pe Google sign in failed
+            // aayega, isliye ya toh baad me user sever par create krte wqt hi kro
+            // linkWihCredentials ka
             currentUser?.linkWithCredential(credential)
                 ?.addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
@@ -56,7 +65,10 @@ class CreateUserActivity : AppCompatActivity() {
                         binding.retEmail.text = task.result.user!!.email
                     } else {
                         // Google account link failed
-                        Log.d("TAG", "Google account link failed")
+                        Log.d(
+                            "TAG",
+                            "Google account link failed" + task.exception?.printStackTrace()
+                        )
                         Toast.makeText(
                             this@CreateUserActivity,
                             "Google account link failed",
@@ -65,6 +77,7 @@ class CreateUserActivity : AppCompatActivity() {
                             .show()
                     }
                 }
+
         } catch (e: ApiException) {
             // Google Sign In failed, update UI appropriately
             Log.w("TAG", "Google sign in failed", e)
@@ -104,33 +117,31 @@ class CreateUserActivity : AppCompatActivity() {
         binding.createBtn.setOnClickListener {
             if (validateCustomerFields()) {
 
-                val dialog = LoadingDialog()
-                dialog.show(supportFragmentManager, "loading")
-                dialog.isCancelable = false
-
-                val name = binding.editTextCustomerName.text!!.toString()
-                val address = binding.editTextAddress.text!!.toString()
-                val password = user.uid
-                val phone = user.phoneNumber!!.substring(3)
-                val email = user.email
-                val c = User(
-                    name,
-                    email!!,
-                    getFcmToken(),
-                    password,
-                    phone,
-                    address,
-                    UserRole.Customer,
-                    null,
-                    null,
-                    0,
-                    ObjectId.get()
-                )
-
-                val handler = CoroutineExceptionHandler { a, b ->
-                    Log.d("TAG", "${b.message}")
-                }
+                loading.show(supportFragmentManager, "loading")
+                loading.isCancelable = false
+                
                 lifecycleScope.launch(handler) {
+                    val name = binding.editTextCustomerName.text!!.toString()
+                    val address = binding.editTextAddress.text!!.toString()
+                    val password = user.uid
+                    val phone = user.phoneNumber!!.substring(3)
+                    val email = user.email
+                    val registrationToken = getFcmToken()
+                    val c = User(
+                        name,
+                        email!!,
+                        registrationToken,
+                        password,
+                        phone,
+                        address,
+                        UserRole.Customer,
+                        null,
+                        null,
+                        0,
+                        ObjectId.get()
+                    )
+
+
                     val job1 =
                         async {
                             RetrofitHelper.getInstance(this@CreateUserActivity).createCustomer(c)
@@ -146,7 +157,7 @@ class CreateUserActivity : AppCompatActivity() {
                             }
                         val result2 = job2.await()
                         if (result2.isSuccessful && result2.body() != null) {
-                            dialog.dismiss()
+                            loading.dismiss()
                             PreferenceManager.getInstance(this@CreateUserActivity)
                                 .saveAuthToken(result1.body()!!)
                             PreferenceManager.getInstance(this@CreateUserActivity).add(
@@ -154,7 +165,7 @@ class CreateUserActivity : AppCompatActivity() {
                                     result2.body()!!.name,
                                     result2.body()!!.phone,
                                     result2.body()!!.address,
-                                    getFcmToken(),
+                                    result2.body()!!.registrationToken,
                                     result2.body()!!.id
                                 )
                             )
@@ -164,12 +175,12 @@ class CreateUserActivity : AppCompatActivity() {
                                     MainActivity::class.java
                                 )
                             )
-                            finish()
+                            finishAffinity()
                         }
 
                     } else {
                         Log.d("TAG", "here null")
-                        dialog.dismiss()
+                        loading.dismiss()
                         Toast.makeText(
                             this@CreateUserActivity,
                             "Can't create user right now",
@@ -263,39 +274,44 @@ class CreateUserActivity : AppCompatActivity() {
                 )
 
             } else {
+                Toast.makeText(this@CreateUserActivity, "Couldn't load businness types", Toast.LENGTH_SHORT).show()
                 Log.d("TAG", "Couldn't load businness types")
+                binding.createBtn.isEnabled = false
             }
         }
         binding.retcreateBtn.setOnClickListener {
             if (validateRetailerFields()) {
 
-                val dialog = LoadingDialog()
-                dialog.show(supportFragmentManager, "loading")
-                dialog.isCancelable = false
-
-                val name = binding.editTextRetailerName.text!!.toString()
-                val businessName = binding.editTextShopName.text!!.toString()
-                val address = binding.editTextRetAddress.text!!.toString()
-                val email = user.email
-                val password = user.uid
-                val phone = user.phoneNumber!!.substring(3)
-                val busType = businessTypes[binding.busType.selectedItemPosition].id.toHexString()
-                val r =
-                    User(
-                        name,
-                        email!!,
-                        getFcmToken(),
-                        password,
-                        phone,
-                        address,
-                        UserRole.Retailer,
-                        businessName,
-                        busType,
-                        0,
-                        ObjectId.get()
-                    )
+                loading.show(supportFragmentManager, "loading")
+                loading.isCancelable = false
 
                 lifecycleScope.launch {
+
+                    val name = binding.editTextRetailerName.text!!.toString()
+                    val businessName = binding.editTextShopName.text!!.toString()
+                    val address = binding.editTextRetAddress.text!!.toString()
+                    val email = user.email
+                    val password = user.uid
+                    val phone = user.phoneNumber!!.substring(3)
+                    val busType =
+                        businessTypes[binding.busType.selectedItemPosition].id.toHexString()
+                    val registrationToken = getFcmToken()
+
+                    val r =
+                        User(
+                            name,
+                            email!!,
+                            registrationToken,
+                            password,
+                            phone,
+                            address,
+                            UserRole.Retailer,
+                            businessName,
+                            busType,
+                            0,
+                            ObjectId.get()
+                        )
+
                     val job1 = async {
                         RetrofitHelper.getInstance(this@CreateUserActivity).createRetailer(r)
                     }
@@ -310,7 +326,7 @@ class CreateUserActivity : AppCompatActivity() {
                         val result2 = job2.await()
                         if (result2.isSuccessful && result2.body() != null) {
 
-                            dialog.dismiss()
+                            loading.dismiss()
                             PreferenceManager.getInstance(this@CreateUserActivity)
                                 .saveAuthToken(result1.body()!!)
                             PreferenceManager.getInstance(this@CreateUserActivity).add(
@@ -323,7 +339,7 @@ class CreateUserActivity : AppCompatActivity() {
                                     result2.body()!!.businessName!!,
                                     result2.body()!!.businessType!!,
                                     result2.body()!!.totalSales,
-                                    getFcmToken(),
+                                    result2.body()!!.registrationToken,
                                     result2.body()!!.id
                                 )
                             )
@@ -333,8 +349,8 @@ class CreateUserActivity : AppCompatActivity() {
                                     MainActivity::class.java
                                 )
                             )
-                            finish()
-                        }else{
+                            finishAffinity()
+                        } else {
                             Toast.makeText(
                                 this@CreateUserActivity,
                                 "Some error occurred. Can't get user details from server.",
@@ -343,7 +359,7 @@ class CreateUserActivity : AppCompatActivity() {
                         }
                     } else {
 
-                        dialog.dismiss()
+                        loading.dismiss()
                         Toast.makeText(
                             this@CreateUserActivity,
                             "Can't create user right now",
@@ -355,23 +371,23 @@ class CreateUserActivity : AppCompatActivity() {
             }
         }
     }
-    private fun getFcmToken():String?{
-        var token :String? = null
 
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.w("TAG", "Fetching FCM registration token failed", task.exception)
-
-                return@addOnCompleteListener
-            }
-
-                // Get new FCM registration token
-                token = task.result
-
-                // Log and toast
-                Log.d("TAG", "Got token : $token")
-
+    override fun onBackPressed() {
+        loading.show(supportFragmentManager,"loading")
+        user?.delete()?.addOnCompleteListener {
+            startActivity(Intent(this@CreateUserActivity, SignInActivity::class.java))
+            loading.dismiss()
+            finish()
         }
-        return token
+    }
+    
+    private suspend fun getFcmToken(): String {
+        return try {
+            Log.d("TAG", "Got token : ${FirebaseMessaging.getInstance().token.await()}")
+            FirebaseMessaging.getInstance().token.await()
+        } catch (e: Exception) {
+            Log.w("TAG", "Fetching FCM registration token failed" + e.printStackTrace())
+            ""
+        }
     }
 }
