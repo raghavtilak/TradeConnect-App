@@ -121,7 +121,7 @@ class PushNotificationService : FirebaseMessagingService() {
         if(PreferenceManager.getInstance(this).getAuthToken()!="") {
 
             val jo = JSONObject()
-            jo.put("token", token)
+            jo.put("registrationToken", token)
 
             val body =
                 jo.toString().toRequestBody("application/json".toMediaTypeOrNull())
