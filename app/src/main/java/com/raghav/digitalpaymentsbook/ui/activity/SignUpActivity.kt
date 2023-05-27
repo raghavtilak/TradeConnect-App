@@ -209,6 +209,12 @@ class SignUpActivity : AppCompatActivity() {
                                     )
                                 )
                                 finish()
+                            }else{
+                                Toast.makeText(
+                                    this@SignUpActivity,
+                                    "Some error occurred. Can't get user details from server.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             }
                         } else {
                             dialog.dismiss()
@@ -226,6 +232,12 @@ class SignUpActivity : AppCompatActivity() {
                         // The verification code entered was invalid
                         binding.TextFieldOtp.isErrorEnabled = true
                         binding.TextFieldOtp.error = "Invalid OTP"
+                    }else{
+                        Toast.makeText(
+                            this@SignUpActivity,
+                            "Some error occurred. Try again.",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }

@@ -19,4 +19,10 @@
     <string-array name="sample3">
         <item>Choose Batch</item>
     </string-array>
+
+    <string-array name="analytics_type">
+        <item>Last 7 Days</item>
+        <item>Last 6 Months</item>
+        <item>Last 3 Years</item>
+    </string-array>
 </resources>

@@ -1,9 +1,12 @@
 package com.raghav.digitalpaymentsbook.ui.activity
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.raghav.digitalpaymentsbook.databinding.ActivityMainBinding
 import com.raghav.digitalpaymentsbook.databinding.ActivityProfileBinding
+import com.github.mikephil.charting.formatter.ValueFormatter
+
 
 class ProfileActivity : AppCompatActivity() {
 
@@ -14,6 +17,10 @@ class ProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        binding.analytics.setOnClickListener {
+            startActivity(Intent(this,AnalyticsActivity::class.java))
+        }
 
 
     }

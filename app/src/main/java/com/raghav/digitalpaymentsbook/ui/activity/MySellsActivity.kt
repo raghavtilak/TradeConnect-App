@@ -3,6 +3,7 @@ package com.raghav.digitalpaymentsbook.ui.activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -68,6 +69,11 @@ class MySellsActivity : AppCompatActivity() {
                 loadingDialog.dismiss()
             } else {
                 loadingDialog.dismiss()
+                Toast.makeText(
+                    this@MySellsActivity,
+                    "Some error occurred. Couldn't get your sells.",
+                    Toast.LENGTH_SHORT
+                ).show()
                 Log.d("TAG", "custo her ${result.body()}")
             }
         }

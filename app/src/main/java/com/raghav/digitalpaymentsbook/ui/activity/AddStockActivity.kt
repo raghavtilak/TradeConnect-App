@@ -87,6 +87,7 @@ class AddStockActivity : AppCompatActivity() {
                             "-" + (if (day.toString().length < 2) "0${day}" else "$day")
             }
             newFragment.show(supportFragmentManager, "datePicker")
+
         }
 
         binding.expdate.setOnClickListener {

@@ -11,13 +11,19 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".ui.activity.ProfileActivity"
+            android:name=".ui.activity.AnalyticsActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-        <!-- https://www.youtube.com/watch?v=-ifKTMckAUE -->
+        <activity
+            android:name=".ui.activity.ProfileActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity> <!-- https://www.youtube.com/watch?v=-ifKTMckAUE -->
         <service
             android:name=".PushNotificationService"
             android:exported="false">

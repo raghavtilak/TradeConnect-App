@@ -330,6 +330,12 @@ class CreateUserActivity : AppCompatActivity() {
                                 )
                             )
                             finish()
+                        }else{
+                            Toast.makeText(
+                                this@CreateUserActivity,
+                                "Some error occurred. Can't get user details from server.",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     } else {
 

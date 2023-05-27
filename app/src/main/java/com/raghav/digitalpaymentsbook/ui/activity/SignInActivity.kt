@@ -106,6 +106,11 @@ class SignInActivity : AppCompatActivity() {
             firebaseAuthWithGoogle(account.idToken)
         } catch (e: ApiException) {
             // Google Sign In failed, update UI appropriately
+            Toast.makeText(
+                this@SignInActivity,
+                "Couldn't sign you in. Try signing in through phone number",
+                Toast.LENGTH_LONG
+            ).show()
             loadingDialog.dismiss()
             Log.w("TAG", "Google sign in failed", e)
         }
@@ -201,7 +206,14 @@ class SignInActivity : AppCompatActivity() {
                         // The verification code entered was invalid
                         binding.TextFieldOtp.isErrorEnabled = true
                         binding.TextFieldOtp.error = "Invalid OTP"
+                    }else{
+                        Toast.makeText(
+                            this@SignInActivity,
+                            "Some error occurred. Try again.",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
+
                 }
             }
     }
@@ -298,6 +310,12 @@ class SignInActivity : AppCompatActivity() {
                     )
                 )
                 finish()
+            }else{
+                Toast.makeText(
+                    this@SignInActivity,
+                    "Some error occurred. Can't get user details from server.",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
         else{

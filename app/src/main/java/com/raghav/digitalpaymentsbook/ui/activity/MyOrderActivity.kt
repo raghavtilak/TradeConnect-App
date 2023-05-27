@@ -3,6 +3,7 @@ package com.raghav.digitalpaymentsbook.ui.activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -61,6 +62,12 @@ class MyOrderActivity : AppCompatActivity() {
 
             if (res1.isSuccessful && res1.body() != null) {
                 adapter.submitList(res1.body())
+            }else{
+                Toast.makeText(
+                    this@MyOrderActivity,
+                    "Some error occurred. Couldn't load your orders.",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
             binding.recyclerView.adapter = adapter
             loadingDialog.dismiss()

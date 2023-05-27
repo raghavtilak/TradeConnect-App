@@ -167,6 +167,11 @@ class ViewStoreActivity : AppCompatActivity() {
 
             } else {
                 loadingDialog.dismiss()
+                Toast.makeText(
+                    this@ViewStoreActivity,
+                    "Some error occurred. Couldn't get your store details.",
+                    Toast.LENGTH_SHORT
+                ).show()
                 Log.d("TAG", "custo her ${result.body()}")
             }
         }

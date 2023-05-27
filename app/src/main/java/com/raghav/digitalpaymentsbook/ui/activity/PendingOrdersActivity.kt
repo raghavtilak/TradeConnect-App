@@ -78,7 +78,7 @@ class PendingOrdersActivity : AppCompatActivity() {
             }else{
                 Toast.makeText(
                     this@PendingOrdersActivity,
-                    "Can't load connections",
+                    "Can't load pending orders",
                     Toast.LENGTH_SHORT
                 ).show()
                 loadingDialog.dismiss()

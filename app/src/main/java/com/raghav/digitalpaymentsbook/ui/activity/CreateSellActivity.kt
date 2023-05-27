@@ -139,6 +139,11 @@ class CreateSellActivity : AppCompatActivity() {
                     }
                 }
             } else {
+                Toast.makeText(
+                    this@CreateSellActivity,
+                    "Some error occurred. Couldn't load your connections.",
+                    Toast.LENGTH_SHORT
+                ).show()
                 Log.d("TAG", "Couldn't load connections")
             }
         }

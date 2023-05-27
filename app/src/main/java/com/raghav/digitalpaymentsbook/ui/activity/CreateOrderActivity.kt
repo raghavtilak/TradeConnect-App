@@ -119,6 +119,11 @@ class CreateOrderActivity : AppCompatActivity() {
                     updateUi()
                 }
             } else {
+                Toast.makeText(
+                    this@CreateOrderActivity,
+                    "Some error occurred. Couldn't load your connections.",
+                    Toast.LENGTH_SHORT
+                ).show()
                 Log.d("TAG", "Couldn't load connections")
             }
         }

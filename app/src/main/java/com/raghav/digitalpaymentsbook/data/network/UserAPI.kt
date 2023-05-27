@@ -5,6 +5,7 @@ import com.raghav.digitalpaymentsbook.data.model.apis.CreateConnection
 import com.raghav.digitalpaymentsbook.data.model.apis.RetailerProduct
 import com.raghav.digitalpaymentsbook.data.model.apis.RetailerSignIn
 import com.raghav.digitalpaymentsbook.data.model.apis.ServerResponse
+import com.raghav.digitalpaymentsbook.data.model.enums.AnalyticsType
 import com.raghav.digitalpaymentsbook.data.model.enums.BusinessTypes
 import com.raghav.digitalpaymentsbook.data.model.enums.ConnectionStatus
 import com.raghav.digitalpaymentsbook.data.model.enums.OrderStatus
@@ -95,5 +96,15 @@ interface UserAPI {
     @GET("retailer/my_products")
     suspend fun getMyProducts():Response<List<RetailerProduct>>
 
+    @GET("retailer/my_orders_analytics")
+    suspend fun getOrderAnalytics(@Query("startingFrom") startingFrom:String,
+                                  @Query("type") type:AnalyticsType,
+                                  @Query("noOfDays") noOfDays:Int,
+                                  @Query("isCreatedByUser") isCreatedByUser:Boolean):Response<List<AnalyticsData>>
+    @GET("retailer/my_sales_analytics")
+    suspend fun getSalesAnalytics(@Query("startingFrom") startingFrom:String,
+                                  @Query("type") type:AnalyticsType,
+                                  @Query("noOfDays") noOfDays:Int,
+                                  @Query("isCreatedByUser") isCreatedByUser:Boolean):Response<List<AnalyticsData>>
 
 }
