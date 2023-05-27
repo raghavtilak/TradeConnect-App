@@ -71,6 +71,8 @@ class CreateUserActivity : AppCompatActivity() {
         }
     }
 
+    var businessTypes = mutableListOf<BusinessTypes>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityCreateUserBinding.inflate(layoutInflater)
@@ -252,6 +254,8 @@ class CreateUserActivity : AppCompatActivity() {
             val response = job.await()
             if (response.isSuccessful && response.body() != null) {
 
+                businessTypes.addAll(response.body()!!)
+
                 binding.busType.adapter = ArrayAdapter(
                     this@CreateUserActivity,
                     android.R.layout.simple_spinner_item,
@@ -275,7 +279,7 @@ class CreateUserActivity : AppCompatActivity() {
                 val email = user.email
                 val password = user.uid
                 val phone = user.phoneNumber!!.substring(3)
-                val busType = (binding.busType.selectedItem as BusinessTypes).id.toHexString()
+                val busType = businessTypes[binding.busType.selectedItemPosition].id.toHexString()
                 val r =
                     User(
                         name,

@@ -13,7 +13,6 @@ data class BusinessTypes(
     val id: ObjectId
 ) : Parcelable {
     override fun toString(): String {
-
         return name
     }
 }
