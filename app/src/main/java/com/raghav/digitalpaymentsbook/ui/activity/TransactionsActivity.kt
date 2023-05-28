@@ -62,7 +62,7 @@ class TransactionsActivity : AppCompatActivity() {
         lifecycleScope.launch(handler){
             val result = RetrofitHelper.getInstance(this@TransactionsActivity)
                 .getAllTransactions(viewmodel.retailer!!.id.toHexString()
-                ,viewmodel.customer!!.customerPhone.toLong())
+                ,viewmodel.customer!!.phone.toLong())
             if(result.isSuccessful && result.body()!=null){
                 Log.d("TAG","transaction:${result.body()}")
                 val list = result.body()!!

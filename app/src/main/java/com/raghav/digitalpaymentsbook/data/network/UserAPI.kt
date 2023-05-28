@@ -32,8 +32,8 @@ interface UserAPI {
     suspend fun createCustomer(@Body customer: User):Response<String>
 
 
-    @GET("customer/retailers/{customerId}")
-    suspend fun getRetailerOfACustomers(@Path("customerId") customerId: String):Response<List<Retailer>>
+    @GET("customer/my_retailers")
+    suspend fun getRetailerOfACustomers(@Query("email") email: String):Response<List<Retailer>>
 
     @GET("retailer/customers/{retailerId}")
     suspend fun getCustomersOfARetailer(@Path("retailerId") retailerId: String):Response<List<Customer>>
@@ -75,13 +75,17 @@ interface UserAPI {
     suspend fun getBatchesById(@Query("ids") ids:List<ObjectId>):Response<List<Batch>>
 
     @GET("retailer/{id}/products")
-    suspend fun getRetailerProducts(@Query("id") id:ObjectId):Response<List<RetailerProduct>>
+    suspend fun getRetailerProducts(@Path("id") id:ObjectId):Response<List<RetailerProduct>>
 
     @GET("retailer/{batchNo}/get_batch_by_no")
     suspend fun findBatch(@Path("batchNo") batchNo:String):Response<Batch>
 
     @PUT("retailer/update_token")
     suspend fun updateNotificationToken(@Body body: RequestBody):Response<ServerResponse>
+
+
+    @PUT("retailer/update_batch")
+    suspend fun updateBatch(@Query("batchId") batchId : ObjectId,@Body batchDetails: RequestBody):Response<ServerResponse>
 
 
     @POST("retailer/add_batch_to_inventory")
@@ -93,18 +97,26 @@ interface UserAPI {
     @POST("retailer/create_order")
     suspend fun createOrder(@Body body: RequestBody):Response<ServerResponse>
 
+    @POST("retailer/record_a_sell")
+    suspend fun createSell(@Body body: RequestBody):Response<ServerResponse>
+
+
     @GET("retailer/my_products")
     suspend fun getMyProducts():Response<List<RetailerProduct>>
+
+    @GET("retailer/my_profile")
+    suspend fun getMyProfile():Response<MyProfile>
+
 
     @GET("retailer/my_orders_analytics")
     suspend fun getOrderAnalytics(@Query("startingFrom") startingFrom:String,
                                   @Query("type") type:AnalyticsType,
                                   @Query("noOfDays") noOfDays:Int,
-                                  @Query("isCreatedByUser") isCreatedByUser:Boolean):Response<List<AnalyticsData>>
+                                  @Query("isCreatedByUser") isCreatedByUser:Boolean):Response<MutableList<AnalyticsData>>
     @GET("retailer/my_sales_analytics")
     suspend fun getSalesAnalytics(@Query("startingFrom") startingFrom:String,
                                   @Query("type") type:AnalyticsType,
                                   @Query("noOfDays") noOfDays:Int,
-                                  @Query("isCreatedByUser") isCreatedByUser:Boolean):Response<List<AnalyticsData>>
+                                  @Query("isCreatedByUser") isCreatedByUser:Boolean):Response<MutableList<AnalyticsData>>
 
 }

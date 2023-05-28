@@ -11,8 +11,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.messaging.FirebaseMessaging
@@ -40,48 +44,19 @@ class CreateUserActivity : AppCompatActivity() {
     val user = FirebaseAuth.getInstance().currentUser
     lateinit var gso: GoogleSignInOptions
     val handler =
-        CoroutineExceptionHandler { _, throwable -> Log.d("TAG", "ERROR=${throwable.message}") }
+        CoroutineExceptionHandler { _, throwable ->
+            Log.d("TAG", "ERROR=${throwable.message}" + throwable.printStackTrace())
+
+        }
 
     val loading = LoadingDialog()
-    
+    lateinit var gsignTask : Task<GoogleSignInAccount>
+
     val launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        val task = GoogleSignIn.getSignedInAccountFromIntent(it.data)
-        try {
-            // Google Sign In was successful, authenticate with Firebase
-            val account = task.getResult(ApiException::class.java)!!
-            Log.d("TAG", "firebaseAuthWithGoogle:" + account.id)
-            val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-            val currentUser = FirebaseAuth.getInstance().currentUser
-
-            //TODO: if yha pe credentials link kr rhe hai
-            // then vps is email button par click krne pe Google sign in failed
-            // aayega, isliye ya toh baad me user sever par create krte wqt hi kro
-            // linkWihCredentials ka
-            currentUser?.linkWithCredential(credential)
-                ?.addOnCompleteListener(this) { task ->
-                    if (task.isSuccessful) {
-                        // Google account linked successfully
-                        Log.d("TAG", "Google account linked successfully")
-                        binding.retEmail.text = task.result.user!!.email
-                    } else {
-                        // Google account link failed
-                        Log.d(
-                            "TAG",
-                            "Google account link failed" + task.exception?.printStackTrace()
-                        )
-                        Toast.makeText(
-                            this@CreateUserActivity,
-                            "Google account link failed",
-                            Toast.LENGTH_SHORT
-                        )
-                            .show()
-                    }
-                }
-
-        } catch (e: ApiException) {
-            // Google Sign In failed, update UI appropriately
-            Log.w("TAG", "Google sign in failed", e)
-        }
+        gsignTask = GoogleSignIn.getSignedInAccountFromIntent(it.data)
+        // Google Sign In was successful, authenticate with Firebase
+        val account = gsignTask.getResult(ApiException::class.java)!!
+        binding.retEmail.text = account.email
     }
 
     var businessTypes = mutableListOf<BusinessTypes>()
@@ -96,6 +71,7 @@ class CreateUserActivity : AppCompatActivity() {
             .requestEmail()
             .build()
 
+
         when (intent.getSerializableExtra("role") as UserRole) {
             UserRole.Retailer -> {
                 showForRetailer()
@@ -106,13 +82,23 @@ class CreateUserActivity : AppCompatActivity() {
         }
     }
 
-    fun showForCustomer() {
+    private fun showForCustomer() {
         binding.customerLayout.visibility = View.VISIBLE
         binding.retailerLayout.visibility = View.GONE
 
         binding.phoneNo.text = Editable.Factory.getInstance().newEditable(user!!.phoneNumber)
         binding.customerEmailCard.setOnClickListener {
-            launcher.launch(GoogleSignIn.getClient(this, gso).signInIntent)
+            val mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
+
+            //check google login sign in or not
+            val account = GoogleSignIn.getLastSignedInAccount(this)
+            if(account==null){
+                val signInIntent = mGoogleSignInClient.signInIntent
+                launcher.launch(signInIntent)
+            }else{
+                // clear account
+                revokeAccess(mGoogleSignInClient)
+            }
         }
         binding.createBtn.setOnClickListener {
             if (validateCustomerFields()) {
@@ -125,11 +111,11 @@ class CreateUserActivity : AppCompatActivity() {
                     val address = binding.editTextAddress.text!!.toString()
                     val password = user.uid
                     val phone = user.phoneNumber!!.substring(3)
-                    val email = user.email
+                    val email = binding.custEmail.text.toString()
                     val registrationToken = getFcmToken()
                     val c = User(
                         name,
-                        email!!,
+                        email,
                         registrationToken,
                         password,
                         phone,
@@ -163,6 +149,7 @@ class CreateUserActivity : AppCompatActivity() {
                             PreferenceManager.getInstance(this@CreateUserActivity).add(
                                 Customer(
                                     result2.body()!!.name,
+                                    result2.body()!!.email,
                                     result2.body()!!.phone,
                                     result2.body()!!.address,
                                     result2.body()!!.registrationToken,
@@ -208,6 +195,16 @@ class CreateUserActivity : AppCompatActivity() {
             return false
         }
 
+        if (user == null) {
+            Log.d("TAG","VALIDATE CUSTOMER= User is null")
+            return false
+        }
+        if (binding.custEmail.text.isNullOrBlank()) {
+            Toast.makeText(this@CreateUserActivity, "Email is required", Toast.LENGTH_SHORT)
+                .show()
+            return false
+        }
+
         return true
 
     }
@@ -240,7 +237,7 @@ class CreateUserActivity : AppCompatActivity() {
         if (user == null) {
             return false
         }
-        if (user.email == null) {
+        if (binding.retEmail.text.isNullOrBlank()) {
             Toast.makeText(this@CreateUserActivity, "Email is required", Toast.LENGTH_SHORT)
                 .show()
             return false
@@ -249,7 +246,7 @@ class CreateUserActivity : AppCompatActivity() {
 
     }
 
-    fun showForRetailer() {
+    private fun showForRetailer() {
 
         binding.customerLayout.visibility = View.GONE
         binding.retailerLayout.visibility = View.VISIBLE
@@ -257,7 +254,19 @@ class CreateUserActivity : AppCompatActivity() {
         binding.phoneNo.text = Editable.Factory.getInstance().newEditable(user!!.phoneNumber)
 
         binding.retailerEmailCard.setOnClickListener {
-            launcher.launch(GoogleSignIn.getClient(this, gso).signInIntent)
+
+            val mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
+
+            //check google login sign in or not
+            val account = GoogleSignIn.getLastSignedInAccount(this)
+            if(account==null){
+                val signInIntent = mGoogleSignInClient.signInIntent
+                launcher.launch(signInIntent)
+            }else{
+                // clear account
+                revokeAccess(mGoogleSignInClient)
+            }
+
         }
         lifecycleScope.launch {
             val job =
@@ -285,12 +294,12 @@ class CreateUserActivity : AppCompatActivity() {
                 loading.show(supportFragmentManager, "loading")
                 loading.isCancelable = false
 
-                lifecycleScope.launch {
+                lifecycleScope.launch(handler) {
 
                     val name = binding.editTextRetailerName.text!!.toString()
                     val businessName = binding.editTextShopName.text!!.toString()
                     val address = binding.editTextRetAddress.text!!.toString()
-                    val email = user.email
+                    val email = binding.retEmail.text.toString()
                     val password = user.uid
                     val phone = user.phoneNumber!!.substring(3)
                     val busType =
@@ -317,6 +326,43 @@ class CreateUserActivity : AppCompatActivity() {
                     }
                     val result1 = job1.await()
                     if (result1.isSuccessful && result1.body() != null) {
+
+                        try {
+                            // Google Sign In was successful, authenticate with Firebase
+                            val account = gsignTask.getResult(ApiException::class.java)!!
+                            Log.d("TAG", "firebaseAuthWithGoogle:" + account.id)
+                            val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+                            val currentUser = FirebaseAuth.getInstance().currentUser
+
+
+                            val res = currentUser?.linkWithCredential(credential)?.await()
+                            if(res!=null){
+                                Log.d("TAG", "Google account linked successfully")
+                                binding.retEmail.text = res.user!!.email
+                            }else{
+                                Toast.makeText(
+                                    this@CreateUserActivity,
+                                    "Google account link failed",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                // Google account link failed
+                                Log.d(
+                                    "TAG",
+                                    "Google account link failed"
+                                )
+                                return@launch
+                            }
+
+                        } catch (e: ApiException) {
+                            Toast.makeText(
+                                this@CreateUserActivity,
+                                "Google sign in failed",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            // Google Sign In failed, update UI appropriately
+                            Log.w("TAG", "Google sign in failed", e)
+                            return@launch
+                        }
 
                         val job2 = async {
                             RetrofitHelper.getInstance(this@CreateUserActivity)
@@ -375,7 +421,6 @@ class CreateUserActivity : AppCompatActivity() {
     override fun onBackPressed() {
         loading.show(supportFragmentManager,"loading")
         user?.delete()?.addOnCompleteListener {
-            startActivity(Intent(this@CreateUserActivity, SignInActivity::class.java))
             loading.dismiss()
             finish()
         }
@@ -389,5 +434,13 @@ class CreateUserActivity : AppCompatActivity() {
             Log.w("TAG", "Fetching FCM registration token failed" + e.printStackTrace())
             ""
         }
+    }
+
+    private fun revokeAccess(mGoogleSignInClient: GoogleSignInClient) {
+        mGoogleSignInClient.revokeAccess()
+            .addOnCompleteListener(this) {
+                val signInIntent = mGoogleSignInClient.signInIntent
+                launcher.launch(signInIntent)
+            }
     }
 }

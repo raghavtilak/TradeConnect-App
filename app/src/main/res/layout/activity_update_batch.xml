@@ -12,7 +12,7 @@
         android:id="@+id/t1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add Stock"
+        android:text="Update Batch"
         android:textColor="@color/colorSecondary"
         android:textSize="42sp"
         android:textStyle="bold"
@@ -141,7 +141,7 @@
                 android:id="@+id/editTextMrp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                
+
                 android:inputType="numberSigned"
                 android:lines="1"
                 android:maxLength="30"
@@ -179,7 +179,7 @@
                 android:id="@+id/editTextQuantity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                
+
                 android:inputType="numberSigned"
                 android:lines="1"
                 android:maxLength="30"
@@ -303,7 +303,7 @@
                 android:id="@+id/editTextBuyPrice"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                
+
                 android:inputType="numberSigned"
                 android:lines="1"
                 android:maxLength="30"
@@ -341,7 +341,7 @@
                 android:id="@+id/editTextSellPrice"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                
+
                 android:inputType="numberSigned"
                 android:lines="1"
                 android:maxLength="30"
@@ -357,14 +357,14 @@
         app:cardCornerRadius="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:cardBackgroundColor="@color/colorSecondary">
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:text="Add"
-        android:textAlignment="center"
-        android:textColor="@color/white"
-        android:textSize="22sp"
-        android:textStyle="bold" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="Update"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="22sp"
+            android:textStyle="bold" />
     </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

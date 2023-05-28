@@ -12,7 +12,8 @@ import com.raghav.digitalpaymentsbook.ui.fragment.BatchDetailFragment
 
 class BatchDetailTabAdapter(
     fragmentActivity: FragmentActivity,
-    private val batches:List<Batch>
+    private val batches:List<Batch>,
+    private val showUpdateOption :Boolean
 ) : FragmentStateAdapter(fragmentActivity) {
     override fun getItemCount(): Int {
         return batches.size
@@ -22,7 +23,7 @@ class BatchDetailTabAdapter(
 
         val b = Bundle()
         b.putParcelable("batch", batches[position])
-        val frag: Fragment = BatchDetailFragment()
+        val frag: Fragment = BatchDetailFragment(showUpdateOption)
         frag.arguments = b
         return frag
 

@@ -34,6 +34,77 @@
             app:layout_constraintBottom_toTopOf="@id/addStock"
             app:layout_constraintTop_toTopOf="parent">
 
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/customerNameCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/TextFieldCustName"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Customer Name"
+                    app:boxBackgroundColor="@color/white"
+                    app:boxStrokeColor="@color/colorPrimaryDark"
+                    app:hintAnimationEnabled="false"
+                    app:hintTextColor="@color/colorPrimaryDark"
+                    app:prefixTextAppearance="@style/CustomPrefixStyle">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextCustName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:imeOptions="actionSearch"
+                        android:inputType="numberSigned"
+                        android:lines="1"
+                        android:maxLength="10"
+                        android:maxLines="1"
+                        android:textSize="18sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/customerEmailCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/customerNameCard">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/TextFieldCustEmail"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Customer Email"
+                    app:boxBackgroundColor="@color/white"
+                    app:boxStrokeColor="@color/colorPrimaryDark"
+                    app:hintAnimationEnabled="false"
+                    app:hintTextColor="@color/colorPrimaryDark"
+                    app:prefixTextAppearance="@style/CustomPrefixStyle">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextCustEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:imeOptions="actionSearch"
+                        android:inputType="numberSigned"
+                        android:lines="1"
+                        android:maxLength="10"
+                        android:maxLines="1"
+                        android:textSize="18sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </com.google.android.material.card.MaterialCardView>
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/chooseRetCard"
@@ -73,16 +144,12 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/chooseBatchCard"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
+                android:layout_marginEnd="5dp"
                 app:cardCornerRadius="10dp"
                 app:cardElevation="8dp"
-                android:layout_marginEnd="5dp"
-                app:layout_constraintHorizontal_weight="1"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintEnd_toStartOf="@+id/quantityCard"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/chooseProductCard">
 
 
@@ -96,17 +163,13 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/quantityCard"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                app:cardCornerRadius="10dp"
                 android:layout_marginStart="5dp"
+                app:cardCornerRadius="10dp"
                 app:cardElevation="8dp"
-                app:layout_constraintHorizontal_weight="1"
-                app:layout_constraintStart_toEndOf="@+id/chooseBatchCard"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/chooseProductCard">
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/linear2">
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/TextFieldQuantity"
@@ -139,8 +202,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/rounded_corners"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
                 android:paddingTop="20dp"
                 android:paddingBottom="10dp"
                 android:translationY="-10dp"
@@ -150,7 +211,7 @@
                     android:id="@+id/productDetails"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
+                    android:layout_marginHorizontal="10dp"
                     android:orientation="vertical"
                     android:visibility="gone">
 
@@ -162,11 +223,11 @@
                         android:text="Product Name"
                         android:textColor="@color/colorSecondary"
                         android:textSize="18sp" />
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
-
 
 
                         <TextView
@@ -187,6 +248,7 @@
                             android:textSize="18sp" />
 
                     </LinearLayout>
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -218,7 +280,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
-                        android:src="@drawable/ic_baseline_add_24"/>
+                        android:src="@drawable/ic_baseline_add_24" />
 
                 </LinearLayout>
             </LinearLayout>
@@ -226,9 +288,59 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"
                 android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_constraintBottom_toTopOf="@id/paidCard"
+                app:layout_constraintTop_toBottomOf="@id/quantityCard"
+                tools:listitem="@layout/item_batch" />
+
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/paidCard"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:listitem="@layout/item_batch"
-                app:layout_constraintTop_toBottomOf="@id/linear2" />
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="8dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/recyclerView"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/TextFieldPaid"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Paid"
+                    app:prefixText="₹"
+                    app:boxBackgroundColor="@color/white"
+                    app:boxStrokeColor="@color/colorPrimaryDark"
+                    app:hintAnimationEnabled="false"
+                    app:hintTextColor="@color/colorPrimaryDark"
+                    app:prefixTextAppearance="@style/CustomPrefixStyle">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextPaid"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:imeOptions="actionSearch"
+                        android:inputType="numberSigned"
+                        android:lines="1"
+                        android:maxLength="10"
+                        android:maxLines="1"
+                        android:textSize="18sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/custGroup"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:constraint_referenced_ids="customerNameCard,customerEmailCard" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

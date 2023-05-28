@@ -1,15 +1,17 @@
 package com.raghav.digitalpaymentsbook.ui.activity
 
 import android.annotation.SuppressLint
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.util.Log
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
+import com.raghav.digitalpaymentsbook.data.model.Batch
 import com.raghav.digitalpaymentsbook.data.network.RetrofitHelper
 import com.raghav.digitalpaymentsbook.databinding.ActivityAddStockBinding
+import com.raghav.digitalpaymentsbook.databinding.ActivityUpdateBatchBinding
 import com.raghav.digitalpaymentsbook.ui.dialog.LoadingDialog
 import com.raghav.digitalpaymentsbook.ui.fragment.DatePickerFragment
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -21,11 +23,10 @@ import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.*
 
-class AddStockActivity : AppCompatActivity() {
-
-    lateinit var binding: ActivityAddStockBinding
+class UpdateBatchActivity : AppCompatActivity() {
+    
+    lateinit var binding: ActivityUpdateBatchBinding
 
     val loadingDialog = LoadingDialog()
 
@@ -36,12 +37,32 @@ class AddStockActivity : AppCompatActivity() {
         )
     }
 
+
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityAddStockBinding.inflate(layoutInflater)
+        binding = ActivityUpdateBatchBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val batch = intent.getParcelableExtra<Batch>("batch")!!
+
+        if(!batch.isUpdateAllowed!!){
+            binding.editTextBatchNo.isEnabled = false
+            binding.editTextMrp.isEnabled = false
+            binding.editTextProductName.isEnabled = false
+            binding.mfgTV.isEnabled = false
+            binding.expTV.isEnabled = false
+            binding.searchCard.isEnabled = false
+        }
+
+        binding.editTextBatchNo.text = Editable.Factory.getInstance().newEditable(batch.batchNo)
+        binding.editTextMrp.text = Editable.Factory.getInstance().newEditable(batch.MRP.toString())
+        binding.editTextProductName.text = Editable.Factory.getInstance().newEditable(batch.productName)
+        binding.mfgTV.text = Editable.Factory.getInstance().newEditable(SimpleDateFormat("yyyy-MM-dd").format(batch.mfg))
+        binding.expTV.text = Editable.Factory.getInstance().newEditable(SimpleDateFormat("yyyy-MM-dd").format(batch.expiry))
+        binding.editTextQuantity.text = Editable.Factory.getInstance().newEditable(batch.quantity.toString())
+        binding.editTextSellPrice.text = Editable.Factory.getInstance().newEditable(batch.sellingPrice.toString())
+        binding.editTextBuyPrice.text = Editable.Factory.getInstance().newEditable(batch.buyingPrice.toString())
 
         binding.addStock.setOnClickListener {
 
@@ -71,16 +92,16 @@ class AddStockActivity : AppCompatActivity() {
 
                 lifecycleScope.launch {
                     val job = async {
-                        RetrofitHelper.getInstance(this@AddStockActivity)
-                            .addBatchToInventory(body)
+                        RetrofitHelper.getInstance(this@UpdateBatchActivity)
+                            .updateBatch(batch.id,body)
                     }
                     val res = job.await()
                     if (res.isSuccessful && res.body() != null) {
-                        Toast.makeText(this@AddStockActivity, "Added stock successfully", Toast.LENGTH_SHORT)
+                        Toast.makeText(this@UpdateBatchActivity, "Added stock successfully", Toast.LENGTH_SHORT)
                             .show()
                         finish()
                     }else{
-                        Toast.makeText(this@AddStockActivity, "Couldn't add stock. Some error occurred", Toast.LENGTH_SHORT)
+                        Toast.makeText(this@UpdateBatchActivity, "Couldn't add stock. Some error occurred", Toast.LENGTH_SHORT)
                             .show()
                     }
                     loadingDialog.dismiss()
@@ -101,7 +122,7 @@ class AddStockActivity : AppCompatActivity() {
 
         binding.expTV.setOnClickListener {
             val newFragment: DialogFragment = DatePickerFragment { _, year, month, day ->
-                binding.expTV.text =Editable.Factory.getInstance().newEditable(
+                binding.expTV.text = Editable.Factory.getInstance().newEditable(
                     "$year-" +
                             (if (month.toString().length < 2) "0${month + 1}" else "${month + 1}") +
                             "-" + (if (day.toString().length < 2) "0${day}" else "$day"))
@@ -114,7 +135,7 @@ class AddStockActivity : AppCompatActivity() {
                 loadingDialog.show(supportFragmentManager,"loading")
                 lifecycleScope.launch(handler) {
                     val job = async {
-                        RetrofitHelper.getInstance(this@AddStockActivity)
+                        RetrofitHelper.getInstance(this@UpdateBatchActivity)
                             .findBatch(binding.editTextBatchNo.text.toString())
                     }
                     val res = job.await()
@@ -125,11 +146,13 @@ class AddStockActivity : AppCompatActivity() {
                             binding.editTextQuantity.text = Editable.Factory.getInstance().newEditable(this.quantity.toString())
                             binding.editTextBuyPrice.text = Editable.Factory.getInstance().newEditable(this.buyingPrice.toString())
                             binding.editTextSellPrice.text = Editable.Factory.getInstance().newEditable(this.sellingPrice.toString())
-                            binding.mfgTV.text = Editable.Factory.getInstance().newEditable(SimpleDateFormat("yyyy-MM-dd").format(this.mfg!!))
-                            binding.expTV.text = Editable.Factory.getInstance().newEditable(SimpleDateFormat("yyyy-MM-dd").format(this.expiry!!))
+                            binding.mfgTV.text = Editable.Factory.getInstance().newEditable(
+                                SimpleDateFormat("yyyy-MM-dd").format(this.mfg!!))
+                            binding.expTV.text = Editable.Factory.getInstance().newEditable(
+                                SimpleDateFormat("yyyy-MM-dd").format(this.expiry!!))
                         }
                     }else{
-                        Toast.makeText(this@AddStockActivity, "No batch found", Toast.LENGTH_SHORT)
+                        Toast.makeText(this@UpdateBatchActivity, "No batch found", Toast.LENGTH_SHORT)
                             .show()
                     }
                     loadingDialog.dismiss()
@@ -163,5 +186,4 @@ class AddStockActivity : AppCompatActivity() {
 
         return true
     }
-
 }

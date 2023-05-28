@@ -7,9 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,6 +22,7 @@ import com.raghav.digitalpaymentsbook.data.model.Batch
 import com.raghav.digitalpaymentsbook.data.model.Retailer
 import com.raghav.digitalpaymentsbook.data.model.apis.RetailerProduct
 import com.raghav.digitalpaymentsbook.data.model.enums.ConnectionStatus
+import com.raghav.digitalpaymentsbook.data.model.enums.UserRole
 import com.raghav.digitalpaymentsbook.data.network.RetrofitHelper
 import com.raghav.digitalpaymentsbook.databinding.ActivityCreateSellBinding
 import com.raghav.digitalpaymentsbook.databinding.ItemBatchBinding
@@ -29,6 +34,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONArray
 import org.json.JSONObject
 
 
@@ -52,6 +58,23 @@ class CreateSellActivity : AppCompatActivity() {
         binding = ActivityCreateSellBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val role = intent.getSerializableExtra("role") as UserRole
+
+        when(role){
+            UserRole.Retailer -> {
+                binding.custGroup.isVisible = false
+                binding.chooseRetCard.isVisible = true
+
+            }
+            UserRole.Customer -> {
+                binding.chooseRetCard.isVisible = false
+                binding.custGroup.isVisible = true
+
+                binding.chooseProductCard.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                    topToBottom = binding.customerEmailCard.id
+                }
+            }
+        }
 
         val retAdapter = object : ArrayAdapter<Retailer>(
             this@CreateSellActivity, 0,
@@ -62,7 +85,7 @@ class CreateSellActivity : AppCompatActivity() {
                 convertView: View?,
                 parent: ViewGroup
             ): View {
-                return initView(position, convertView, parent)
+                return initGetView(position, convertView, parent)
             }
 
             override fun getDropDownView(
@@ -70,10 +93,21 @@ class CreateSellActivity : AppCompatActivity() {
                 convertView: View?,
                 parent: ViewGroup
             ): View {
-                return initView(position, convertView, parent)
+                return initDropDownView(position, convertView, parent)
             }
 
-            private fun initView(
+            private fun initGetView(
+                position: Int,
+                convertView: View?,
+                parent: ViewGroup
+            ):View{
+                val textView = TextView(this@CreateSellActivity)
+                val c = getItem(position)!!
+                textView.text = c.name
+                textView.updatePadding(20,0,0,0)
+                return textView
+            }
+            private fun initDropDownView(
                 position: Int,
                 convertView: View?,
                 parent: ViewGroup
@@ -96,6 +130,7 @@ class CreateSellActivity : AppCompatActivity() {
                 return binding.root
             }
         }
+
         binding.chooseRet.adapter = retAdapter
 
         lifecycleScope.launch(handler) {
@@ -148,7 +183,6 @@ class CreateSellActivity : AppCompatActivity() {
             }
         }
 
-
     }
 
     private fun updateUi() {
@@ -168,7 +202,7 @@ class CreateSellActivity : AppCompatActivity() {
                 convertView: View?,
                 parent: ViewGroup
             ): View {
-                return initView(position, convertView, parent)
+                return initGetView(position, convertView, parent)
             }
 
             override fun getDropDownView(
@@ -176,10 +210,22 @@ class CreateSellActivity : AppCompatActivity() {
                 convertView: View?,
                 parent: ViewGroup
             ): View {
-                return initView(position, convertView, parent)
+                return initDropDownView(position, convertView, parent)
             }
 
-            private fun initView(
+            private fun initGetView(
+                position: Int,
+                convertView: View?,
+                parent: ViewGroup
+            ):View{
+                val textView = TextView(this@CreateSellActivity)
+                val c = getItem(position)!!
+                textView.text = getItem(position)!!.batchNo
+                textView.updatePadding(20,0,0,0)
+                return textView
+            }
+
+            private fun initDropDownView(
                 position: Int,
                 convertView: View?,
                 parent: ViewGroup
@@ -209,8 +255,11 @@ class CreateSellActivity : AppCompatActivity() {
                 position: Int,
                 id: Long
             ) {
-                batchAdapter.clear()
-                batchAdapter.addAll((binding.chooseProduct.selectedItem as RetailerProduct).batches)
+                if(products.isNotEmpty()) {
+                    batchAdapter.clear()
+                    batchAdapter.addAll((products[binding.chooseProduct.selectedItemPosition]).batches)
+                }
+                binding.productDetails.isVisible = false
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -241,7 +290,7 @@ class CreateSellActivity : AppCompatActivity() {
                 binding.TextFieldQuantity.isErrorEnabled = false
                 binding.productDetails.isVisible = true
                 with(binding) {
-                    val c = binding.chooseProduct.selectedItem as Batch
+                    val c = products[binding.chooseProduct.selectedItemPosition].batches[position]
                     productName.text = c.productName
                     quantity.text = "Quantity: ${c.quantity}"
                     mrp.text = "MRP: ₹${c.MRP}"
@@ -260,7 +309,10 @@ class CreateSellActivity : AppCompatActivity() {
 
         var orderBatchAdapter: BatchAdapter? = null
         orderBatchAdapter = BatchAdapter {
-            orderBatchAdapter?.currentList?.remove(it)
+            val nl= mutableListOf<Batch>()
+            nl.addAll(orderBatchAdapter?.currentList!!)
+            nl.remove(it)
+            orderBatchAdapter?.submitList(nl)
         }
         binding.recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         binding.recyclerView.adapter = orderBatchAdapter
@@ -279,34 +331,51 @@ class CreateSellActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
-                orderBatchAdapter.currentList.add(binding.chooseBatch.selectedItem as Batch)
+                val nl= mutableListOf<Batch>()
+                nl.addAll(orderBatchAdapter.currentList)
+                nl.add(binding.chooseBatch.selectedItem as Batch)
+                orderBatchAdapter.submitList(nl)
             }
         }
         binding.createOrder.setOnClickListener {
 
             if (orderBatchAdapter.itemCount == 0) {
                 Toast.makeText(this, "There are no products", Toast.LENGTH_SHORT).show()
-            } else {
+            }else if(binding.editTextPaid.text.isNullOrBlank()){
+                binding.TextFieldPaid.isErrorEnabled = true
+                binding.TextFieldPaid.error = "This amount is required"
+//                Toast.makeText(this, "There are no products", Toast.LENGTH_SHORT).show()
+            }else if(binding.editTextPaid.text.toString().toInt() > orderBatchAdapter.currentList.sumOf { it.sellingPrice }){
+                Toast.makeText(this, "Paid amount can't be greater than total sell amount", Toast.LENGTH_LONG).show()
+
+            }
+            else {
 
 
                 lifecycleScope.launch(handler) {
 
                     val order = JSONObject()
                     order.put(
-                        "receiverId",
+                        "toRetailerId",
                         (binding.chooseRet.selectedItem as Retailer).id.toHexString()
                     )
                     order.put(
-                        "totalAmount",
+                        "totalPrice",
                         orderBatchAdapter.currentList.sumOf { it.sellingPrice })
 
-                    val batches = mutableListOf<JSONObject>()
+                    //TODO Paid
+                    order.put(
+                        "paid",
+                        binding.editTextPaid.text.toString().toInt())
+
+
+                    val batches = JSONArray()
                     orderBatchAdapter.currentList.forEach {
                         val batch = JSONObject()
-                        order.put("batchNo", it.batchNo)
-                        order.put("quantity", it.quantity)
-                        order.put("price", it.sellingPrice)
-                        batches.add(batch)
+                        batch.put("batchNo", it.batchNo)
+                        batch.put("quantity", it.quantity)
+                        batch.put("price", it.sellingPrice)
+                        batches.put(batch)
                     }
                     order.put("batches", batches)
 
@@ -316,7 +385,7 @@ class CreateSellActivity : AppCompatActivity() {
                     val job =
                         async {
                             RetrofitHelper.getInstance(this@CreateSellActivity)
-                                .createOrder(body)
+                                .createSell(body)
                         }
                     val response = job.await()
                     if (response.isSuccessful && response.body() != null) {
@@ -325,6 +394,7 @@ class CreateSellActivity : AppCompatActivity() {
                             response.body()?.message,
                             Toast.LENGTH_SHORT
                         ).show()
+                        finish()
                     } else {
                         Toast.makeText(
                             this@CreateSellActivity,

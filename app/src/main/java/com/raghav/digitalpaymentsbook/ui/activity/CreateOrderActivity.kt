@@ -7,9 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,6 +30,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONArray
 import org.json.JSONObject
 
 
@@ -44,7 +47,7 @@ class CreateOrderActivity : AppCompatActivity() {
     }
 
     var products: MutableList<RetailerProduct> = mutableListOf()
-
+    val retailers = mutableListOf<Retailer>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,7 +64,7 @@ class CreateOrderActivity : AppCompatActivity() {
                 convertView: View?,
                 parent: ViewGroup
             ): View {
-                return initView(position, convertView, parent)
+                return initGetView(position, convertView, parent)
             }
 
             override fun getDropDownView(
@@ -69,10 +72,21 @@ class CreateOrderActivity : AppCompatActivity() {
                 convertView: View?,
                 parent: ViewGroup
             ): View {
-                return initView(position, convertView, parent)
+                return initDropDownView(position, convertView, parent)
             }
 
-            private fun initView(
+            private fun initGetView(
+                position: Int,
+                convertView: View?,
+                parent: ViewGroup
+            ):View{
+                val textView = TextView(this@CreateOrderActivity)
+                val c = getItem(position)!!
+                textView.text = c.name
+                textView.updatePadding(20,0,0,0)
+                return textView
+            }
+            private fun initDropDownView(
                 position: Int,
                 convertView: View?,
                 parent: ViewGroup
@@ -148,7 +162,7 @@ class CreateOrderActivity : AppCompatActivity() {
                 convertView: View?,
                 parent: ViewGroup
             ): View {
-                return initView(position, convertView, parent)
+                return initGetView(position, convertView, parent)
             }
 
             override fun getDropDownView(
@@ -156,10 +170,22 @@ class CreateOrderActivity : AppCompatActivity() {
                 convertView: View?,
                 parent: ViewGroup
             ): View {
-                return initView(position, convertView, parent)
+                return initDropDownView(position, convertView, parent)
             }
 
-            private fun initView(
+            private fun initGetView(
+                position: Int,
+                convertView: View?,
+                parent: ViewGroup
+            ):View{
+                val textView = TextView(this@CreateOrderActivity)
+                val c = getItem(position)!!
+                textView.text = getItem(position)!!.batchNo
+                textView.updatePadding(20,0,0,0)
+                return textView
+            }
+
+            private fun initDropDownView(
                 position: Int,
                 convertView: View?,
                 parent: ViewGroup
@@ -189,8 +215,11 @@ class CreateOrderActivity : AppCompatActivity() {
                 position: Int,
                 id: Long
             ) {
-                batchAdapter.clear()
-                batchAdapter.addAll((binding.chooseProduct.selectedItem as RetailerProduct).batches)
+                if(products.isNotEmpty()) {
+                    batchAdapter.clear()
+                    batchAdapter.addAll((products[binding.chooseProduct.selectedItemPosition]).batches)
+                }
+                binding.productDetails.isVisible = false
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -249,7 +278,7 @@ class CreateOrderActivity : AppCompatActivity() {
                 binding.TextFieldQuantity.isErrorEnabled = false
                 binding.productDetails.isVisible = true
                 with(binding) {
-                    val c = binding.chooseProduct.selectedItem as Batch
+                    val c = products[binding.chooseProduct.selectedItemPosition].batches[position]
                     productName.text = c.productName
                     quantity.text = "Quantity: ${c.quantity}"
                     mrp.text = "MRP: ₹${c.MRP}"
@@ -264,7 +293,10 @@ class CreateOrderActivity : AppCompatActivity() {
 
         var orderBatchAdapter: BatchAdapter? = null
         orderBatchAdapter = BatchAdapter {
-            orderBatchAdapter?.currentList?.remove(it)
+            val nl= mutableListOf<Batch>()
+            nl.addAll(orderBatchAdapter?.currentList!!)
+            nl.remove(it)
+            orderBatchAdapter?.submitList(nl)
         }
         binding.recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         binding.recyclerView.adapter = orderBatchAdapter
@@ -283,7 +315,10 @@ class CreateOrderActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
-                orderBatchAdapter.currentList.add(binding.chooseBatch.selectedItem as Batch)
+                val nl= mutableListOf<Batch>()
+                nl.addAll(orderBatchAdapter.currentList)
+                nl.add(binding.chooseBatch.selectedItem as Batch)
+                orderBatchAdapter.submitList(nl)
             }
         }
         binding.createOrder.setOnClickListener {
@@ -304,13 +339,13 @@ class CreateOrderActivity : AppCompatActivity() {
                         "totalAmount",
                         orderBatchAdapter.currentList.sumOf { it.sellingPrice })
 
-                    val batches = mutableListOf<JSONObject>()
+                    val batches = JSONArray()
                     orderBatchAdapter.currentList.forEach {
                         val batch = JSONObject()
-                        order.put("batchNo", it.batchNo)
-                        order.put("quantity", it.quantity)
-                        order.put("price", it.sellingPrice)
-                        batches.add(batch)
+                        batch.put("batchNo", it.batchNo)
+                        batch.put("quantity", it.quantity)
+                        batch.put("price", it.sellingPrice)
+                        batches.put(batch)
                     }
                     order.put("batches", batches)
 
@@ -329,6 +364,7 @@ class CreateOrderActivity : AppCompatActivity() {
                             response.body()?.message,
                             Toast.LENGTH_SHORT
                         ).show()
+                        finish()
                     } else {
                         Toast.makeText(
                             this@CreateOrderActivity,

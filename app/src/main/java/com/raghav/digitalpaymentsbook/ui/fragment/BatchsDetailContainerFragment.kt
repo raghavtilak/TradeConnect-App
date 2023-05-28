@@ -13,7 +13,7 @@ import com.raghav.digitalpaymentsbook.adapter.BatchDetailTabAdapter
 import com.raghav.digitalpaymentsbook.data.model.Batch
 import com.raghav.digitalpaymentsbook.databinding.FragmentBatchsDetailContainerBinding
 
-class BatchsDetailContainerFragment : BottomSheetDialogFragment() {
+class BatchsDetailContainerFragment(val showUpdateOption:Boolean) : BottomSheetDialogFragment() {
 
     private var _binding: FragmentBatchsDetailContainerBinding? = null
     val binding: FragmentBatchsDetailContainerBinding
@@ -39,7 +39,7 @@ class BatchsDetailContainerFragment : BottomSheetDialogFragment() {
 
         batches = arguments?.getParcelableArrayList("batches")
         batches?.let {
-            val adapter = BatchDetailTabAdapter(requireActivity(), it)
+            val adapter = BatchDetailTabAdapter(requireActivity(), it, showUpdateOption)
             binding.viewpager.adapter = adapter
             binding.viewpager.offscreenPageLimit = 5
 

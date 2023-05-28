@@ -7,11 +7,11 @@ import com.raghav.digitalpaymentsbook.data.model.enums.AnalyticsType
 
 class AnalyticsViewModel : ViewModel() {
 
-    val ordersByUserData = MutableLiveData<List<AnalyticsData>>()
-    val salesByUserData= MutableLiveData<List<AnalyticsData>>()
+    val ordersByUserData = MutableLiveData<MutableList<AnalyticsData>>()
+    val salesByUserData= MutableLiveData<MutableList<AnalyticsData>>()
 
-    val ordersByOtherData= MutableLiveData<List<AnalyticsData>>()
-    val salesByOtherData= MutableLiveData<List<AnalyticsData>>()
+    val ordersByOtherData= MutableLiveData<MutableList<AnalyticsData>>()
+    val salesByOtherData= MutableLiveData<MutableList<AnalyticsData>>()
 
     val salesIsBarChartType = MutableLiveData<Boolean>()
     val ordersIsBarChartType = MutableLiveData<Boolean>()

@@ -37,15 +37,22 @@ class SellItemAdapter (private val onItemClickListener: (retailer: SellItem)->Un
 
         holder.binding.apply {
             val c = currentList[holder.adapterPosition]
-            retailerName.text = c.toRetailer.name
-            businessName.text = c.toRetailer.businessName
-            price.text = "Price: ₹${c.totalPrice}"
-            avatarText.text = if (c.toRetailer.businessName.contains(" "))
-                "${c.toRetailer.businessName.split(" ")[0][0]}${c.toRetailer.businessName.split(" ")[1][0]}"
-            else
-                c.toRetailer.businessName[0].toString()
 
-            batchCount.text = "Batch(s): ${c.batches.size}"
+            if(c.isCustomerSale && c.toRetailer!=null){
+                retailerName.text = c.toRetailer.name
+                businessName.text = c.toRetailer.businessName
+                price.text = "Price: ₹${c.totalPrice}"
+                avatarText.text = if (c.toRetailer.businessName.contains(" "))
+                    "${c.toRetailer.businessName.split(" ")[0][0]}${c.toRetailer.businessName.split(" ")[1][0]}"
+                else
+                    c.toRetailer.businessName[0].toString()
+                batchCount.text = "Batch(s): ${c.batches.size}"
+
+            }else{
+
+            }
+
+
             date.text = SimpleDateFormat("dd/MM/yyyy").format(c.date)
 
             if(c.due ==0){

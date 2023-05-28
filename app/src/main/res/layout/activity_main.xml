@@ -43,7 +43,6 @@
             android:src="@drawable/ic_baseline_person_24" />
     </androidx.cardview.widget.CardView>
 
-
     <androidx.cardview.widget.CardView
         android:id="@+id/viewStore"
         android:layout_width="150dp"
@@ -179,8 +178,8 @@
             android:padding="20dp">
 
             <ImageView
-                android:layout_width="60dp"
-                android:layout_height="60dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:layout_marginBottom="10dp"
                 android:src="@drawable/ic_my_connections"
                 app:tint="@color/colorSecondary" />
@@ -195,6 +194,27 @@
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/retGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="viewStore,myOrder,mySells,myConnections" />
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefresh"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/businessName">
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:listitem="@layout/item_customer" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <!--    <androidx.cardview.widget.CardView-->
     <!--        android:id="@+id/store"-->

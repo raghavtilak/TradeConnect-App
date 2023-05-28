@@ -10,7 +10,7 @@
         android:id="@+id/customerLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone"
+        android:visibility="visible"
         android:background="@color/colorPrimary">
 
         <ImageView
@@ -152,7 +152,7 @@
 
     <RelativeLayout
         android:id="@+id/retailerLayout"
-        android:visibility="visible"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/colorPrimary">

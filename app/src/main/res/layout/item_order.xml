@@ -76,8 +76,7 @@
                 android:id="@+id/icon"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:rotation="225"
-                android:src="@drawable/ic_baseline_arrow_downward_24"
+                android:src="@drawable/ic_baseline_arrow_inward_24"
                 app:tint="@color/green" />
 
         </LinearLayout>

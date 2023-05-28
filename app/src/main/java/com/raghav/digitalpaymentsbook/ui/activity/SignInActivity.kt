@@ -293,6 +293,7 @@ class SignInActivity : AppCompatActivity() {
                         PreferenceManager.getInstance(this@SignInActivity).add(
                             Customer(
                                 result2.body()!!.name,
+                                result2.body()!!.email,
                                 result2.body()!!.phone,
                                 result2.body()!!.address,
                                 result2.body()!!.registrationToken,

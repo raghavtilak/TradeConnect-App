@@ -8,10 +8,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.raghav.digitalpaymentsbook.adapter.SellItemAdapter
+import com.raghav.digitalpaymentsbook.data.model.enums.UserRole
 import com.raghav.digitalpaymentsbook.data.network.RetrofitHelper
 import com.raghav.digitalpaymentsbook.databinding.ActivityMySellsBinding
+import com.raghav.digitalpaymentsbook.ui.dialog.ChooseRoleDialog
 import com.raghav.digitalpaymentsbook.ui.dialog.LoadingDialog
 import com.raghav.digitalpaymentsbook.ui.fragment.BatchsDetailContainerFragment
+import com.raghav.digitalpaymentsbook.util.Constants
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 
@@ -35,7 +38,7 @@ class MySellsActivity : AppCompatActivity() {
         binding.recyclerView.layoutManager = LinearLayoutManager(this@MySellsActivity)
 
         adapter = SellItemAdapter {
-            val frag = BatchsDetailContainerFragment()
+            val frag = BatchsDetailContainerFragment(false)
             val bundle = Bundle()
             bundle.putParcelableArrayList("batches", ArrayList(it.batches))
             frag.arguments = bundle
@@ -52,7 +55,13 @@ class MySellsActivity : AppCompatActivity() {
         }
 
         binding.addSell.setOnClickListener {
-            startActivity(Intent(this,CreateSellActivity::class.java))
+            val roleDialog = ChooseRoleDialog("Create Sell for",onCustomerClick = {
+                startActivity(Intent(this,CreateSellActivity::class.java).putExtra("role",UserRole.Customer))
+            }, onRetailerClick = {
+                startActivity(Intent(this,CreateSellActivity::class.java).putExtra("role",UserRole.Retailer))
+            })
+            roleDialog.show(supportFragmentManager, "roleDialog")
+            roleDialog.isCancelable = false
         }
     }
 

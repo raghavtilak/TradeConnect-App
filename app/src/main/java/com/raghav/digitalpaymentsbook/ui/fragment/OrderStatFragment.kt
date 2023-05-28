@@ -1,5 +1,6 @@
 package com.raghav.digitalpaymentsbook.ui.fragment
 
+import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -47,12 +48,15 @@ class OrderStatFragment(private val isSentTypeFrag : Boolean) : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel =  ViewModelProvider(this)[AnalyticsViewModel::class.java]
+        viewModel =  ViewModelProvider(requireActivity())[AnalyticsViewModel::class.java]
 
         viewModel.ordersIsBarChartType.observe(viewLifecycleOwner){
             binding.barChartOrder.isVisible = it
             binding.pieChartOrder.isVisible = !it
         }
+
+        barChartCustomisation()
+        pieChartCustomisation()
 
         if(isSentTypeFrag){
             viewModel.ordersByUserData.observe(viewLifecycleOwner){
@@ -89,9 +93,6 @@ class OrderStatFragment(private val isSentTypeFrag : Boolean) : Fragment() {
                 }
             }
         }
-        
-
-        
 
 
     }
@@ -106,52 +107,21 @@ class OrderStatFragment(private val isSentTypeFrag : Boolean) : Fragment() {
 
         lifecycleScope.launch {
 
-            val cal: Calendar = Calendar.getInstance()
-            // get starting date
-            cal.add(Calendar.DAY_OF_YEAR, -7)
-            val sdf4: DateFormat = SimpleDateFormat("EEE")
-
             data.forEachIndexed { i, it ->
-                cal.add(Calendar.DAY_OF_YEAR, 1)
                 entries.add(BarEntry(i.toFloat(), it.count.toFloat()))
-                weekdaysEntries.add(sdf4.format(cal.time))
+                weekdaysEntries.add(getWeekName(it.key))
             }
 
             val dataSets: MutableList<IBarDataSet?> = mutableListOf()
             val set1 = BarDataSet(entries, "Income")
             set1.valueTextSize = 10f
             set1.setColors(*ColorTemplate.PASTEL_COLORS)
+            set1.valueTextColor = Color.WHITE
             dataSets.add(set1)
-
-//customization
-            binding.barChartOrder.setTouchEnabled(true)
-            //                binding.barChartOrder.setDragEnabled(true);
-            binding.barChartOrder.setScaleEnabled(false)
-            binding.barChartOrder.setPinchZoom(false)
-            binding.barChartOrder.setDrawGridBackground(false)
-
-////to hide background lines
-            binding.barChartOrder.xAxis.setDrawGridLines(false)
-            binding.barChartOrder.axisLeft.setDrawGridLines(false)
-            binding.barChartOrder.axisRight.setDrawGridLines(false)
-
-//to hide right Y and top X border
-            val rightYAxis: YAxis = binding.barChartOrder.axisRight
-            rightYAxis.isEnabled = false
-            val xAxis: XAxis = binding.barChartOrder.xAxis
-            xAxis.granularity = 1f
-            xAxis.isEnabled = true
-            xAxis.setDrawGridLines(false)
-            xAxis.position = XAxis.XAxisPosition.BOTTOM
 
             //String setter in x-Axis
             binding.barChartOrder.xAxis.valueFormatter = IndexAxisValueFormatter(weekdaysEntries)
-            binding.barChartOrder.axisLeft.spaceBottom = 0f
-            binding.barChartOrder.axisLeft.valueFormatter = object : ValueFormatter() {
-                override fun getFormattedValue(value: Float): String {
-                    return value.toInt().toString()
-                }
-            }
+
             val data = BarData(dataSets)
             data.setValueFormatter(object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String {
@@ -159,22 +129,7 @@ class OrderStatFragment(private val isSentTypeFrag : Boolean) : Fragment() {
                 }
             })
             binding.barChartOrder.data = data
-            binding.barChartOrder.animateX(500)
-            binding.barChartOrder.animateY(1000)
-            binding.barChartOrder.legend.isEnabled = false
-            binding.barChartOrder.description.isEnabled = false
-            binding.barChartOrder.setOnChartValueSelectedListener(object :
-                OnChartValueSelectedListener {
-                override fun onValueSelected(e: Entry, h: Highlight) {
 
-                    lifecycleScope.launch {
-
-
-                    }
-                }
-
-                override fun onNothingSelected() {}
-            })
         }
     }
 
@@ -186,16 +141,11 @@ class OrderStatFragment(private val isSentTypeFrag : Boolean) : Fragment() {
         val entries: MutableList<PieEntry> = mutableListOf()
         lifecycleScope.launch {
 
-            val sdf4: DateFormat = SimpleDateFormat("EEE")
-            val cal: Calendar = Calendar.getInstance()
-            // get starting date
-            cal.add(Calendar.DAY_OF_YEAR, -7)
 
             // loop adding one day in each iteration
             data.forEachIndexed { i, it ->
-                cal.add(Calendar.DAY_OF_YEAR, 1)
                 if (it.count != 0) {
-                    entries.add(PieEntry(it.count.toFloat(), sdf4.format(cal.time), i))
+                    entries.add(PieEntry(it.count.toFloat(), getWeekName(it.key), i))
                 }
             }
 
@@ -210,21 +160,6 @@ class OrderStatFragment(private val isSentTypeFrag : Boolean) : Fragment() {
             val data = PieData(set)
             binding.pieChartOrder.data = data
 
-
-//customization
-            binding.pieChartOrder.setTouchEnabled(true)
-            binding.pieChartOrder.animateX(500)
-            binding.pieChartOrder.animateY(1000)
-            binding.pieChartOrder.legend.isEnabled = false
-            binding.pieChartOrder.description.isEnabled = false
-            binding.pieChartOrder.setOnChartValueSelectedListener(object :
-                OnChartValueSelectedListener {
-                override fun onValueSelected(e: Entry, h: Highlight) {
-
-                }
-
-                override fun onNothingSelected() {}
-            })
         }
     }
 
@@ -238,52 +173,21 @@ class OrderStatFragment(private val isSentTypeFrag : Boolean) : Fragment() {
 
         lifecycleScope.launch {
 
-            val sdf2: DateFormat = SimpleDateFormat("MMMM")
-            val cal: Calendar = Calendar.getInstance()
-            // get starting date
-            cal.add(Calendar.MONTH, -6)
-
             data.forEachIndexed { i, it ->
-                cal.add(Calendar.MONTH, 1)
                 entries.add(BarEntry(i.toFloat(), it.count.toFloat()))
-                monthsEntries.add(sdf2.format(cal.time).substring(0, 3))
+                monthsEntries.add(getMonthName(it.key))
             }
 
             val dataSets: MutableList<IBarDataSet?> = mutableListOf()
             val set1 = BarDataSet(entries, "Income")
             set1.valueTextSize = 10f
             set1.setColors(*ColorTemplate.PASTEL_COLORS)
+            set1.valueTextColor = Color.WHITE
             dataSets.add(set1)
-
-//customization
-            binding.barChartOrder.setTouchEnabled(true)
-            //                binding.barChartOrder.setDragEnabled(true);
-            binding.barChartOrder.setScaleEnabled(false)
-            binding.barChartOrder.setPinchZoom(false)
-            binding.barChartOrder.setDrawGridBackground(false)
-
-////to hide background lines
-            binding.barChartOrder.xAxis.setDrawGridLines(false)
-            binding.barChartOrder.axisLeft.setDrawGridLines(false)
-            binding.barChartOrder.axisRight.setDrawGridLines(false)
-
-//to hide right Y and top X border
-            val rightYAxis: YAxis = binding.barChartOrder.axisRight
-            rightYAxis.isEnabled = false
-            val xAxis: XAxis = binding.barChartOrder.xAxis
-            xAxis.granularity = 1f
-            xAxis.isEnabled = true
-            xAxis.setDrawGridLines(false)
-            xAxis.position = XAxis.XAxisPosition.BOTTOM
 
             //String setter in x-Axis
             binding.barChartOrder.xAxis.valueFormatter = IndexAxisValueFormatter(monthsEntries)
-            binding.barChartOrder.axisLeft.spaceBottom = 0f
-            binding.barChartOrder.axisLeft.valueFormatter = object : ValueFormatter() {
-                override fun getFormattedValue(value: Float): String {
-                    return value.toInt().toString()
-                }
-            }
+
             val data = BarData(dataSets)
             data.setValueFormatter(object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String {
@@ -291,22 +195,7 @@ class OrderStatFragment(private val isSentTypeFrag : Boolean) : Fragment() {
                 }
             })
             binding.barChartOrder.data = data
-            binding.barChartOrder.animateX(500)
-            binding.barChartOrder.animateY(1000)
-            binding.barChartOrder.legend.isEnabled = false
-            binding.barChartOrder.description.isEnabled = false
-            binding.barChartOrder.setOnChartValueSelectedListener(object :
-                OnChartValueSelectedListener {
-                override fun onValueSelected(e: Entry, h: Highlight) {
 
-                    lifecycleScope.launch {
-
-
-                    }
-                }
-
-                override fun onNothingSelected() {}
-            })
         }
     }
 
@@ -320,17 +209,10 @@ class OrderStatFragment(private val isSentTypeFrag : Boolean) : Fragment() {
         val listOfWords: MutableMap<Int, MutableList<String>> = mutableMapOf()
         lifecycleScope.launch {
 
-            val sdf2: DateFormat = SimpleDateFormat("MMMM")
-            val sdf3: DateFormat = SimpleDateFormat("yyyy")
-            val cal: Calendar = Calendar.getInstance()
-            // get starting date
-            cal.add(Calendar.MONTH, -6)
-
             // loop adding one day in each iteration
             data.forEachIndexed { i, it ->
-                cal.add(Calendar.MONTH, 1)
                 if (it.count != 0) {
-                    entries.add(PieEntry(it.count.toFloat(), sdf2.format(cal.time), i))
+                    entries.add(PieEntry(it.count.toFloat(), getMonthName(it.key), i))
                 }
             }
 
@@ -345,21 +227,6 @@ class OrderStatFragment(private val isSentTypeFrag : Boolean) : Fragment() {
             val data = PieData(set)
             binding.pieChartOrder.data = data
 
-
-//customization
-            binding.pieChartOrder.setTouchEnabled(true)
-            binding.pieChartOrder.animateX(500)
-            binding.pieChartOrder.animateY(1000)
-            binding.pieChartOrder.legend.isEnabled = false
-            binding.pieChartOrder.description.isEnabled = false
-            binding.pieChartOrder.setOnChartValueSelectedListener(object :
-                OnChartValueSelectedListener {
-                override fun onValueSelected(e: Entry, h: Highlight) {
-
-                }
-
-                override fun onNothingSelected() {}
-            })
         }
     }
 
@@ -367,60 +234,27 @@ class OrderStatFragment(private val isSentTypeFrag : Boolean) : Fragment() {
 
         binding.barChartOrder.invalidate()
 //        binding.xlabel.text = "Week days"
-
-        //index is weekday, list contains data to fetch the words of that day
-        val listOfWords: MutableMap<Int, MutableList<String>> = mutableMapOf()
         val entries: MutableList<BarEntry> = mutableListOf()
         val yearEntries: MutableList<String> = mutableListOf()
 
         lifecycleScope.launch {
 
-            val sdf3: DateFormat = SimpleDateFormat("yyyy")
-            val cal: Calendar = Calendar.getInstance()
-            // get starting date
-            cal.add(Calendar.YEAR, -5)
-
             data.forEachIndexed { i, it ->
-                cal.add(Calendar.DAY_OF_YEAR, 1)
                 entries.add(BarEntry(i.toFloat(), it.count.toFloat()))
-                yearEntries.add(sdf3.format(cal.time))
+                yearEntries.add(it.key.toString())
             }
 
             val dataSets: MutableList<IBarDataSet?> = mutableListOf()
             val set1 = BarDataSet(entries, "Income")
             set1.valueTextSize = 10f
             set1.setColors(*ColorTemplate.PASTEL_COLORS)
+            set1.valueTextColor = Color.WHITE
             dataSets.add(set1)
 
-//customization
-            binding.barChartOrder.setTouchEnabled(true)
-            //                binding.barChartOrder.setDragEnabled(true);
-            binding.barChartOrder.setScaleEnabled(false)
-            binding.barChartOrder.setPinchZoom(false)
-            binding.barChartOrder.setDrawGridBackground(false)
-
-////to hide background lines
-            binding.barChartOrder.xAxis.setDrawGridLines(false)
-            binding.barChartOrder.axisLeft.setDrawGridLines(false)
-            binding.barChartOrder.axisRight.setDrawGridLines(false)
-
-//to hide right Y and top X border
-            val rightYAxis: YAxis = binding.barChartOrder.axisRight
-            rightYAxis.isEnabled = false
-            val xAxis: XAxis = binding.barChartOrder.xAxis
-            xAxis.granularity = 1f
-            xAxis.isEnabled = true
-            xAxis.setDrawGridLines(false)
-            xAxis.position = XAxis.XAxisPosition.BOTTOM
 
             //String setter in x-Axis
             binding.barChartOrder.xAxis.valueFormatter = IndexAxisValueFormatter(yearEntries)
-            binding.barChartOrder.axisLeft.spaceBottom = 0f
-            binding.barChartOrder.axisLeft.valueFormatter = object : ValueFormatter() {
-                override fun getFormattedValue(value: Float): String {
-                    return value.toInt().toString()
-                }
-            }
+
             val data = BarData(dataSets)
             data.setValueFormatter(object : ValueFormatter() {
                 override fun getFormattedValue(value: Float): String {
@@ -428,22 +262,6 @@ class OrderStatFragment(private val isSentTypeFrag : Boolean) : Fragment() {
                 }
             })
             binding.barChartOrder.data = data
-            binding.barChartOrder.animateX(500)
-            binding.barChartOrder.animateY(1000)
-            binding.barChartOrder.legend.isEnabled = false
-            binding.barChartOrder.description.isEnabled = false
-            binding.barChartOrder.setOnChartValueSelectedListener(object :
-                OnChartValueSelectedListener {
-                override fun onValueSelected(e: Entry, h: Highlight) {
-
-                    lifecycleScope.launch {
-
-
-                    }
-                }
-
-                override fun onNothingSelected() {}
-            })
         }
     }
 
@@ -464,7 +282,7 @@ class OrderStatFragment(private val isSentTypeFrag : Boolean) : Fragment() {
             data.forEachIndexed { i, it ->
                 cal.add(Calendar.YEAR, 1)
                 if (it.count != 0) {
-                    entries.add(PieEntry(it.count.toFloat(), sdf3.format(cal.time), i))
+                    entries.add(PieEntry(it.count.toFloat(), it.key.toString(), i))
                 }
             }
 
@@ -478,23 +296,124 @@ class OrderStatFragment(private val isSentTypeFrag : Boolean) : Fragment() {
             }
             val data = PieData(set)
             binding.pieChartOrder.data = data
-
-
-//customization
-            binding.pieChartOrder.setTouchEnabled(true)
-            binding.pieChartOrder.animateX(500)
-            binding.pieChartOrder.animateY(1000)
-            binding.pieChartOrder.legend.isEnabled = false
-            binding.pieChartOrder.description.isEnabled = false
-            binding.pieChartOrder.setOnChartValueSelectedListener(object :
-                OnChartValueSelectedListener {
-                override fun onValueSelected(e: Entry, h: Highlight) {
-
-                }
-
-                override fun onNothingSelected() {}
-            })
         }
+    }
+
+
+    private fun getWeekName(i: Int): String {
+        return when (i) {
+            1 -> {
+                "Sun"
+            }
+            2 -> {
+                "Mon"
+            }
+            3 -> {
+                "Tue"
+            }
+            4 -> {
+                "Wed"
+            }
+            5 -> {
+                "Thru"
+            }
+            6 -> {
+                "Fri"
+            }
+            else -> {
+                "Sat"
+            }
+        }
+    }
+    private fun getMonthName(i: Int): String {
+        return when (i) {
+            1 -> {
+                "Jan"
+            }
+            2 -> {
+                "Feb"
+            }
+            3 -> {
+                "Mar"
+            }
+            4 -> {
+                "Apr"
+            }
+            5 -> {
+                "May"
+            }
+            6 -> {
+                "Jun"
+            }
+            7 -> {
+                "Jul"
+            }
+            8 -> {
+                "Aug"
+            }
+            9 -> {
+                "Sept"
+            }
+            10 -> {
+                "Oct"
+            }
+            11 -> {
+                "Nov"
+            }
+            else -> {
+                "Dec"
+            }
+        }
+    }
+
+    private fun barChartCustomisation(){
+        //customization
+        binding.barChartOrder.setTouchEnabled(true)
+        //                binding.barChartOrder.setDragEnabled(true);
+        binding.barChartOrder.setScaleEnabled(false)
+        binding.barChartOrder.setPinchZoom(false)
+        binding.barChartOrder.setDrawGridBackground(false)
+
+////to hide background lines
+        binding.barChartOrder.xAxis.setDrawGridLines(false)
+        binding.barChartOrder.axisLeft.setDrawGridLines(false)
+        binding.barChartOrder.axisRight.setDrawGridLines(false)
+
+//to hide right Y and top X border
+        val rightYAxis: YAxis = binding.barChartOrder.axisRight
+        rightYAxis.isEnabled = false
+        val xAxis: XAxis = binding.barChartOrder.xAxis
+        xAxis.granularity = 1f
+        xAxis.isEnabled = true
+        xAxis.setDrawGridLines(false)
+        xAxis.position = XAxis.XAxisPosition.BOTTOM
+
+
+        binding.barChartOrder.animateX(500)
+        binding.barChartOrder.animateY(1000)
+        binding.barChartOrder.legend.isEnabled = false
+        binding.barChartOrder.description.isEnabled = false
+
+        binding.barChartOrder.axisLeft.spaceBottom = 0f
+        binding.barChartOrder.axisLeft.valueFormatter = object : ValueFormatter() {
+            override fun getFormattedValue(value: Float): String {
+                return value.toInt().toString()
+            }
+        }
+        binding.barChartOrder.xAxis.textColor = Color.WHITE
+        binding.barChartOrder.axisLeft.textColor = Color.WHITE
+
+    }
+
+    private fun pieChartCustomisation(){
+//customization
+        binding.pieChartOrder.setTouchEnabled(false)
+        binding.pieChartOrder.animateX(500)
+        binding.pieChartOrder.animateY(1000)
+        binding.pieChartOrder.legend.isEnabled = false
+        binding.pieChartOrder.description.isEnabled = false
+
+        binding.pieChartOrder.setEntryLabelColor(Color.WHITE)
     }
 
 }

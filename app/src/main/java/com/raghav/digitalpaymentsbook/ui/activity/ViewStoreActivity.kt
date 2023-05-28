@@ -2,21 +2,32 @@ package com.raghav.digitalpaymentsbook.ui.activity
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.raghav.digitalpaymentsbook.AndroidDownloader
 import com.raghav.digitalpaymentsbook.adapter.StoreItemAdapter
 import com.raghav.digitalpaymentsbook.data.network.RetrofitHelper
 import com.raghav.digitalpaymentsbook.databinding.ActivityStoreBinding
+import com.raghav.digitalpaymentsbook.databinding.DialogDownloadSheetBinding
 import com.raghav.digitalpaymentsbook.ui.dialog.LoadingDialog
 import com.raghav.digitalpaymentsbook.ui.fragment.BatchsDetailContainerFragment
+import com.raghav.digitalpaymentsbook.util.PreferenceManager
+import com.raghav.digitalpaymentsbook.util.getAuthToken
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -80,7 +91,7 @@ class ViewStoreActivity : AppCompatActivity() {
                     RetrofitHelper.getInstance(this@ViewStoreActivity).getBatchesById(it.batchIds)
                 if (res.isSuccessful && res.body() != null) {
                     loadingDialog.dismiss()
-                    val frag = BatchsDetailContainerFragment()
+                    val frag = BatchsDetailContainerFragment(true)
                     val bundle = Bundle()
                     bundle.putParcelableArrayList("batches", ArrayList(res.body()!!))
                     frag.arguments = bundle
@@ -145,7 +156,7 @@ class ViewStoreActivity : AppCompatActivity() {
         }
 
         binding.bulkAdd.setOnClickListener {
-            launcher.launch("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            showSheetDownloadDialog()
         }
         binding.singleAdd.setOnClickListener {
             startActivity(Intent(this, AddStockActivity::class.java))
@@ -250,6 +261,29 @@ class ViewStoreActivity : AppCompatActivity() {
             loadingDialog.dismiss()
         }
         return JSONArray()
+    }
+
+    private fun showSheetDownloadDialog() {
+
+        val builder = MaterialAlertDialogBuilder(this)
+        var alertDialog: AlertDialog? = null
+
+
+        val binding = DialogDownloadSheetBinding.inflate(layoutInflater)
+        builder.setView(binding.root)
+
+        binding.accept.setOnClickListener {
+            val downloader = AndroidDownloader(this)
+            downloader.downloadFile("https://1f27-157-38-60-9.ngrok-free.app/api/v1/retailer/sample_sheet",PreferenceManager.getInstance(this).getAuthToken())
+            Toast.makeText(this, "File download started..", Toast.LENGTH_SHORT).show()
+            alertDialog?.dismiss()
+        }
+        binding.decline.setOnClickListener {
+            launcher.launch("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            alertDialog!!.dismiss()
+        }
+        alertDialog = builder.show()
+        alertDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
     }
 
 }

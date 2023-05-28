@@ -7,10 +7,10 @@ import org.bson.types.ObjectId
 
 @Parcelize
 data class Customer(
-    val customerName: String,
-//    val password: String?,
-    val customerPhone: String,
-    val customerAddress: String?,
+    val name: String,
+    val email: String,
+    val phone: String,
+    val address: String?,
     val registrationToken: String?,
     @SerializedName("_id")
     val id: ObjectId?

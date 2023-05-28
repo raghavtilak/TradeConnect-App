@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.raghav.digitalpaymentsbook.R
 import com.raghav.digitalpaymentsbook.data.model.Order
 import com.raghav.digitalpaymentsbook.data.model.enums.OrderStatus
 import com.raghav.digitalpaymentsbook.databinding.FragmentOrderDetailsBinding
@@ -56,13 +57,15 @@ class OrderDetailsFragment(
             name.text = "Name: ${order.user.name}"
             email.text = "Email: ${order.user.email}"
 
-            icon.rotation = if(order.isCreatedByUser) 255f else 45f
-            icon.imageTintList = ColorStateList.valueOf(if(order.isCreatedByUser) Color.GREEN else Color.RED)
+                if(order.isCreatedByUser)
+                    icon.setImageDrawable(requireActivity().getDrawable(R.drawable.ic_baseline_arrow_outward_24))
+                else
+                    icon.setImageDrawable(requireActivity().getDrawable(R.drawable.ic_baseline_arrow_inward_24))
 
             type.text = if(order.isCreatedByUser) "Sent to" else "Received From"
 
             batchDetail.setOnClickListener {
-                val frag = BatchsDetailContainerFragment()
+                val frag = BatchsDetailContainerFragment(showUpdateOption = false)
                 val bundle = Bundle()
                 bundle.putParcelableArrayList("batches", ArrayList(order.batches))
                 frag.arguments = bundle

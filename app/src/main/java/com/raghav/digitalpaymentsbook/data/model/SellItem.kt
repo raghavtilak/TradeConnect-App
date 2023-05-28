@@ -10,7 +10,8 @@ import java.util.*
 data class SellItem(
     @SerializedName("_id")
     val id: ObjectId,
-    val toRetailer: Retailer,
+    val toRetailer: Retailer?,
+    val customerName: String?,
     val isCustomerSale: Boolean,
     val totalPrice: Int,
     val paid: Int,

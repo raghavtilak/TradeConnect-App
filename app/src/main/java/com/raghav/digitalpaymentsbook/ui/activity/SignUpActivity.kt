@@ -193,6 +193,7 @@ class SignUpActivity : AppCompatActivity() {
                                         PreferenceManager.getInstance(this@SignUpActivity).add(
                                             Customer(
                                                 result2.body()!!.name,
+                                                result2.body()!!.email,
                                                 result2.body()!!.phone,
                                                 result2.body()!!.address,
                                                 result2.body()!!.registrationToken,
@@ -219,7 +220,13 @@ class SignUpActivity : AppCompatActivity() {
                             }
                         } else {
                             dialog.dismiss()
-                            val roleDialog = ChooseRoleDialog()
+                            val roleDialog = ChooseRoleDialog("Choose Role",onCustomerClick = {
+                                startActivity(Intent(this@SignUpActivity,CreateUserActivity::class.java).putExtra("role",
+                                    UserRole.Customer))
+                            }, onRetailerClick = {
+                                startActivity(Intent(this@SignUpActivity,CreateUserActivity::class.java).putExtra("role",
+                                    UserRole.Retailer))
+                            })
                             roleDialog.show(supportFragmentManager, "roleDialog")
                             roleDialog.isCancelable = false
                         }

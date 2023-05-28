@@ -80,9 +80,7 @@
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="@+id/t2"
             app:layout_constraintStart_toEndOf="@id/retImage"
-            app:layout_constraintStart_toStartOf="@+id/t2"
             app:layout_constraintTop_toBottomOf="@id/name" />
 
         <TextView
@@ -95,29 +93,48 @@
             app:layout_constraintStart_toEndOf="@id/retImage"
             app:layout_constraintTop_toBottomOf="@id/noOfConnections" />
 
+        <LinearLayout
+            android:id="@+id/linear"
+            android:layout_marginStart="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/name"
+            >
         <TextView
-            android:id="@+id/noOfOrders"
+            android:id="@+id/createdOrders"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="4500"
             android:textColor="@color/white"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="@+id/t1"
-            app:layout_constraintStart_toEndOf="@id/noOfConnections"
-            app:layout_constraintStart_toStartOf="@+id/t1"
-            app:layout_constraintTop_toBottomOf="@id/name" />
+            app:drawableEndCompat="@drawable/ic_baseline_arrow_outward_24"
+            app:drawableTint="@color/green" />
+
+        <TextView
+            android:id="@+id/receivedOrders"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="4500"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:drawableEndCompat="@drawable/ic_baseline_arrow_inward_24"
+            app:drawableTint="@color/red" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/t1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
             android:text="orders"
             android:textColor="@color/white"
             android:textSize="18sp"
-            app:layout_constraintStart_toEndOf="@id/t2"
-            app:layout_constraintTop_toBottomOf="@id/noOfOrders" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/linear"
+            app:layout_constraintTop_toBottomOf="@id/linear" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -141,13 +158,13 @@
                 android:padding="10dp">
 
                 <TextView
-                    android:id="@+id/businessName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Business Name"
                     android:textColor="@color/colorSecondary" />
 
                 <TextView
+                    android:id="@+id/businessName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Raju Bhai Kirane wala"

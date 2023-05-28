@@ -10,10 +10,14 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessaging
+import com.raghav.digitalpaymentsbook.adapter.RetailerAdapter
 import com.raghav.digitalpaymentsbook.data.model.enums.UserRole
+import com.raghav.digitalpaymentsbook.data.network.RetrofitHelper
 import com.raghav.digitalpaymentsbook.databinding.ActivityMainBinding
 import com.raghav.digitalpaymentsbook.ui.viewmodel.MainViewmodel
 import com.raghav.digitalpaymentsbook.util.*
@@ -26,7 +30,14 @@ class MainActivity : AppCompatActivity() {
 //    RetailerAdapter.OnItemClickListener {
 
     lateinit var binding: ActivityMainBinding
-    // Declare the launcher at the top of your Activity/Fragment:
+
+    val handler = CoroutineExceptionHandler { coroutineContext, throwable ->
+        Log.d(
+            "TAG",
+            "ERROR=${throwable.message} ${throwable.printStackTrace()}"
+        )
+    }
+
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { isGranted: Boolean ->
@@ -46,65 +57,55 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        System.setProperty("org.apache.poi.javax.xml.stream.XMLInputFactory", "com.fasterxml.aalto.stax.InputFactoryImpl")
-        System.setProperty("org.apache.poi.javax.xml.stream.XMLOutputFactory", "com.fasterxml.aalto.stax.OutputFactoryImpl")
-        System.setProperty("org.apache.poi.javax.xml.stream.XMLEventFactory", "com.fasterxml.aalto.stax.EventFactoryImpl")
+        System.setProperty(
+            "org.apache.poi.javax.xml.stream.XMLInputFactory",
+            "com.fasterxml.aalto.stax.InputFactoryImpl"
+        )
+        System.setProperty(
+            "org.apache.poi.javax.xml.stream.XMLOutputFactory",
+            "com.fasterxml.aalto.stax.OutputFactoryImpl"
+        )
+        System.setProperty(
+            "org.apache.poi.javax.xml.stream.XMLEventFactory",
+            "com.fasterxml.aalto.stax.EventFactoryImpl"
+        )
 
-            val fb = FirebaseAuth.getInstance()
-            if (fb.currentUser == null || !PreferenceManager.getInstance(this).userExist()) {
-                if (fb.currentUser != null) {
-                    fb.signOut()
-                    fb.currentUser!!.delete().addOnCompleteListener {
-                        startActivity(Intent(this@MainActivity, SignInActivity::class.java))
-                        finish()
-                    }
-                }else{
+        val fb = FirebaseAuth.getInstance()
+        if (fb.currentUser == null || !PreferenceManager.getInstance(this).userExist()) {
+            if (fb.currentUser != null) {
+                fb.signOut()
+                fb.currentUser!!.delete().addOnCompleteListener {
                     startActivity(Intent(this@MainActivity, SignInActivity::class.java))
                     finish()
                 }
-
             } else {
-
-//            viewModel = ViewModelProvider(this)[MainViewmodel::class.java]
-                when (PreferenceManager.getInstance(this).typeOfUser()) {
-                    UserRole.Retailer -> {
-                        binding.businessName.text = PreferenceManager.getInstance(this).getRetailer().businessName
-                    }
-                    UserRole.Customer -> {
-                        binding.businessName.text = "Retailers"
-
-                    }
-                    null -> {
-
-                    }
-                }
-
-                binding.viewStore.setOnClickListener {
-                    startActivity(Intent(this@MainActivity, ViewStoreActivity::class.java))
-
-                }
-                binding.myOrder.setOnClickListener {
-                    startActivity(Intent(this@MainActivity, MyOrderActivity::class.java))
-
-                }
-                binding.mySells.setOnClickListener {
-                    startActivity(Intent(this@MainActivity, MySellsActivity::class.java))
-
-                }
-                binding.myConnections.setOnClickListener {
-                    startActivity(Intent(this@MainActivity, MyConnectionsActivity::class.java))
-
-                }
-                binding.profile.setOnClickListener {
-                    startActivity(Intent(this@MainActivity, ProfileActivity::class.java))
-
-                }
-
-                askNotificationPermission()
-//                getFcmToken()
+                startActivity(Intent(this@MainActivity, SignInActivity::class.java))
+                finish()
             }
 
+        } else {
+
+            when (PreferenceManager.getInstance(this).typeOfUser()) {
+                UserRole.Retailer -> {
+                    showForRetailer()
+                }
+                UserRole.Customer -> {
+                    showForCustomer()
+                }
+                null -> {
+                    Toast.makeText(
+                        this,
+                        "Something is wrong, try clearing app data",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+
+            askNotificationPermission()
+//                getFcmToken()
         }
+
+    }
 
     private fun askNotificationPermission() {
         // This is only necessary for API level >= 33 (TIRAMISU)
@@ -127,80 +128,84 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-/*
     private fun showForCustomer() {
-        binding.store.isVisible = false
-        binding.addTransaction.isVisible = false
+        binding.retGroup.isVisible = false
+        binding.recyclerView.isVisible = true
         binding.businessName.text = "Retailers"
 
-        val adapter = RetailerAdapter(this)
-        viewModel.retailerList.observe(this) {
-            adapter.submitList(it.toMutableList())
+        val adapter = RetailerAdapter{
+            startActivity(Intent(this,MySellsActivity::class.java).putExtra("retailer",it))
         }
-
-        lifecycleScope.launch(handler) {
-            Log.d("TAG","at least here ${prefs.getCustomer().id!!.toHexString()}")
-
-            val result =
-                RetrofitHelper.userAPI.getRetailerOfACustomers(prefs.getCustomer().id!!.toHexString())
-            if (result.isSuccessful && result.body() != null) {
-                val list = result.body()!!
-                Log.d("TAG","custo her ${result.body()}")
-                viewModel.retailerList.value = list.toMutableList()
-            }else{
-                Log.d("TAG","custo her ${result.body()}")
-            }
-        }
-
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = adapter
+
+        binding.swipeRefresh.setOnRefreshListener {
+            lifecycleScope.launch(handler) {
+
+                val result =
+                    RetrofitHelper.getInstance(this@MainActivity)
+                        .getRetailerOfACustomers(PreferenceManager.getInstance(this@MainActivity).getCustomer().email)
+                if (result.isSuccessful && result.body() != null) {
+                    val list = result.body()!!
+                    adapter.submitList(list)
+                    Log.d("TAG", "custo her ${result.body()}")
+                } else {
+                    Toast.makeText(this@MainActivity, "Couldn't load retailers", Toast.LENGTH_SHORT)
+                        .show()
+                    Log.d("TAG", "custo her ${result.body()}")
+                }
+            }
+        }
+        lifecycleScope.launch(handler) {
+
+            val result =
+                RetrofitHelper.getInstance(this@MainActivity)
+                    .getRetailerOfACustomers(PreferenceManager.getInstance(this@MainActivity).getCustomer().email)
+            if (result.isSuccessful && result.body() != null) {
+                val list = result.body()!!
+                adapter.submitList(list)
+                Log.d("TAG", "custo her ${result.body()}")
+            } else {
+                Toast.makeText(this@MainActivity, "Couldn't load retailers", Toast.LENGTH_SHORT)
+                    .show()
+                Log.d("TAG", "custo her ${result.body()}")
+            }
+        }
 
     }
 
     private fun showForRetailer() {
-        Log.d("TAG", "here 2")
 
-        binding.addTransaction.visibility = View.VISIBLE
+        binding.businessName.text =
+            PreferenceManager.getInstance(this).getRetailer().businessName
 
-        val r = prefs.getRetailer()
-        binding.businessName.text = r.businessName
+        binding.retGroup.isVisible = true
+        binding.recyclerView.isVisible = false
 
-        val adapter = CustomerAdapter(this)
-        viewModel.customerList.observe(this) {
-            adapter.submitList(it.toMutableList())
-        }
-
-        binding.store.setOnClickListener {
+        binding.viewStore.setOnClickListener {
             startActivity(Intent(this@MainActivity, ViewStoreActivity::class.java))
-        }
-        binding.addTransaction.setOnClickListener {
-//            val addBottomDialogFragment = AddCustomerDialog()
-//            addBottomDialogFragment.show(
-//                supportFragmentManager,
-//                "TAG"
-//            )
-            startActivity(Intent(this@MainActivity, AddProductActivity::class.java))
-        }
 
-        Log.d("TAG", "here4")
-
-        lifecycleScope.launch(handler) {
-            val result =
-                RetrofitHelper.userAPI.getCustomersOfARetailer(prefs.getRetailer().id.toHexString())
-            if (result.isSuccessful && result.body() != null) {
-                Log.d("TAG", "reponse:${result.body()}")
-                val list = result.body()!!
-                viewModel.customerList.value = list.toMutableList()
-            } else {
-                Log.d("TAG", "reponse:${result.body()}, ${result}")
-            }
         }
+        binding.myOrder.setOnClickListener {
+            startActivity(Intent(this@MainActivity, MyOrderActivity::class.java))
 
-        binding.recyclerView.layoutManager = LinearLayoutManager(this)
-        binding.recyclerView.adapter = adapter
+        }
+        binding.mySells.setOnClickListener {
+            startActivity(Intent(this@MainActivity, MySellsActivity::class.java))
+
+        }
+        binding.myConnections.setOnClickListener {
+            startActivity(Intent(this@MainActivity, MyConnectionsActivity::class.java))
+
+        }
+        binding.profile.setOnClickListener {
+            startActivity(Intent(this@MainActivity, ProfileActivity::class.java))
+
+        }
 
     }
 
+/*
     override fun onItemClick(customer: Customer) {
         startActivity(
             Intent(this, TransactionsActivity::class.java)

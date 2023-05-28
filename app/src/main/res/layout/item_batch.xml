@@ -15,7 +15,7 @@
         android:layout_centerVertical="true"
         android:layout_marginStart="10dp"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:padding="10dp">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -52,6 +52,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_marginEnd="10dp"
                 android:text="Batch No"
                 android:textColor="@color/white"
                 android:textSize="18sp" />
