@@ -15,7 +15,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
@@ -52,11 +51,18 @@ class CreateUserActivity : AppCompatActivity() {
     val loading = LoadingDialog()
     lateinit var gsignTask : Task<GoogleSignInAccount>
 
-    val launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+    val retLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         gsignTask = GoogleSignIn.getSignedInAccountFromIntent(it.data)
         // Google Sign In was successful, authenticate with Firebase
         val account = gsignTask.getResult(ApiException::class.java)!!
         binding.retEmail.text = account.email
+    }
+
+    val custLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        gsignTask = GoogleSignIn.getSignedInAccountFromIntent(it.data)
+        // Google Sign In was successful, authenticate with Firebase
+        val account = gsignTask.getResult(ApiException::class.java)!!
+        binding.custEmail.text = account.email
     }
 
     var businessTypes = mutableListOf<BusinessTypes>()
@@ -94,10 +100,10 @@ class CreateUserActivity : AppCompatActivity() {
             val account = GoogleSignIn.getLastSignedInAccount(this)
             if(account==null){
                 val signInIntent = mGoogleSignInClient.signInIntent
-                launcher.launch(signInIntent)
+                custLauncher.launch(signInIntent)
             }else{
                 // clear account
-                revokeAccess(mGoogleSignInClient)
+                revokeAccessCust(mGoogleSignInClient)
             }
         }
         binding.createBtn.setOnClickListener {
@@ -135,6 +141,44 @@ class CreateUserActivity : AppCompatActivity() {
                     val result1 = job1.await()
 
                     if (result1.isSuccessful && result1.body() != null) {
+
+                        try {
+                            // Google Sign In was successful, authenticate with Firebase
+                            val account = gsignTask.getResult(ApiException::class.java)!!
+                            Log.d("TAG", "firebaseAuthWithGoogle:" + account.id)
+                            val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+                            val currentUser = FirebaseAuth.getInstance().currentUser
+
+
+                            val res = currentUser?.linkWithCredential(credential)?.await()
+                            if(res!=null){
+                                Log.d("TAG", "Google account linked successfully")
+                                binding.retEmail.text = res.user!!.email
+                            }else{
+                                Toast.makeText(
+                                    this@CreateUserActivity,
+                                    "Google account link failed",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                // Google account link failed
+                                Log.d(
+                                    "TAG",
+                                    "Google account link failed"
+                                )
+                                return@launch
+                            }
+
+                        } catch (e: ApiException) {
+                            Toast.makeText(
+                                this@CreateUserActivity,
+                                "Google sign in failed",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            // Google Sign In failed, update UI appropriately
+                            Log.w("TAG", "Google sign in failed", e)
+                            return@launch
+                        }
+
 
                         val job2 =
                             async {
@@ -261,10 +305,10 @@ class CreateUserActivity : AppCompatActivity() {
             val account = GoogleSignIn.getLastSignedInAccount(this)
             if(account==null){
                 val signInIntent = mGoogleSignInClient.signInIntent
-                launcher.launch(signInIntent)
+                retLauncher.launch(signInIntent)
             }else{
                 // clear account
-                revokeAccess(mGoogleSignInClient)
+                revokeAccessRet(mGoogleSignInClient)
             }
 
         }
@@ -436,11 +480,19 @@ class CreateUserActivity : AppCompatActivity() {
         }
     }
 
-    private fun revokeAccess(mGoogleSignInClient: GoogleSignInClient) {
+    private fun revokeAccessRet(mGoogleSignInClient: GoogleSignInClient) {
         mGoogleSignInClient.revokeAccess()
             .addOnCompleteListener(this) {
                 val signInIntent = mGoogleSignInClient.signInIntent
-                launcher.launch(signInIntent)
+                retLauncher.launch(signInIntent)
+            }
+    }
+
+    private fun revokeAccessCust(mGoogleSignInClient: GoogleSignInClient) {
+        mGoogleSignInClient.revokeAccess()
+            .addOnCompleteListener(this) {
+                val signInIntent = mGoogleSignInClient.signInIntent
+                custLauncher.launch(signInIntent)
             }
     }
 }

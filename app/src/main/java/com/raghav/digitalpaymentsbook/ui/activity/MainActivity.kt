@@ -134,7 +134,7 @@ class MainActivity : AppCompatActivity() {
         binding.businessName.text = "Retailers"
 
         val adapter = RetailerAdapter{
-            startActivity(Intent(this,MySellsActivity::class.java).putExtra("retailer",it))
+            startActivity(Intent(this,MyTransactionsActivity::class.java).putExtra("retailer",it))
         }
         binding.recyclerView.layoutManager = LinearLayoutManager(this)
         binding.recyclerView.adapter = adapter
