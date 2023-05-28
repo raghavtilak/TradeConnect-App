@@ -14,11 +14,13 @@ import com.raghav.digitalpaymentsbook.data.model.Connection
 import com.raghav.digitalpaymentsbook.data.model.enums.ConnectionStatus
 import com.raghav.digitalpaymentsbook.data.network.RetrofitHelper
 import com.raghav.digitalpaymentsbook.databinding.FragmentConnectionsBinding
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.bson.types.ObjectId
 import org.json.JSONObject
 
 class ConnectionsFragment(private val connections: List<Connection>) : Fragment() {
@@ -26,6 +28,12 @@ class ConnectionsFragment(private val connections: List<Connection>) : Fragment(
     var _binding: FragmentConnectionsBinding? = null
     val binding: FragmentConnectionsBinding
         get() = _binding!!
+
+    val handler =
+        CoroutineExceptionHandler { _, throwable ->
+            Log.d("TAG", "ERROR=${throwable.message}" + throwable.printStackTrace())
+
+        }
 
 
     override fun onCreateView(
@@ -45,16 +53,27 @@ class ConnectionsFragment(private val connections: List<Connection>) : Fragment(
 
             if(connections.isNotEmpty()) {
 
-                val connectionId = connections.find { it.user == retailer }?.id
-                Log.d("TAG","${connectionId ?:"Connection id not found"}")
+                Log.d("TAG","RET ID= ${retailer.id}")
+                var connection:Connection? =null
+                connections.forEach {
+                    Log.d("TAG","CONN ID= ${it.id}")
+                    if(retailer.id == it.user.id){
+                        Log.d("TAG","true")
+                        connection = it
+                    }
+                }
 
-                val frag = RetailerDetailsFragment(retailer, ConnectionStatus.pending, connections[0].isCreatedByUser) { status ->
-                    lifecycleScope.launch {
+                Log.d("TAG","CHECK ID= ${connection?.id}")
+
+
+                val frag = RetailerDetailsFragment(retailer, ConnectionStatus.pending, connection) { status, connId ->
+                    lifecycleScope.launch(handler) {
                         val job = async {
                             val jsonObject = JSONObject()
                             jsonObject.put("status", status.name)
                             val body = jsonObject.toString().toRequestBody("application/json".toMediaTypeOrNull())
-                            RetrofitHelper.getInstance(requireActivity()).updateConnectionReq(connectionId!!,body)
+                            Log.d("TAG","CONN ID= $connId")
+                            RetrofitHelper.getInstance(requireActivity()).updateConnectionReq(connId!!,body)
                         }
                         val res = job.await()
                         if (res.isSuccessful) {

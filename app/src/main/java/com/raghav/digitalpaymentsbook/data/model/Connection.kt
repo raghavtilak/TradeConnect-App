@@ -7,7 +7,7 @@ import org.bson.types.ObjectId
 
 @Parcelize
 data class Connection(
-    @SerializedName("id")
+    @SerializedName("_id")
     val id: ObjectId,
     val isCreatedByUser: Boolean,
     val user: Retailer,

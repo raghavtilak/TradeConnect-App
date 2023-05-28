@@ -4,27 +4,30 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.raghav.digitalpaymentsbook.data.model.Connection
 import com.raghav.digitalpaymentsbook.data.model.enums.ConnectionStatus
 import com.raghav.digitalpaymentsbook.data.model.Retailer
 import com.raghav.digitalpaymentsbook.databinding.FragmentRetailerDetailsBinding
+import org.bson.types.ObjectId
 
 class RetailerDetailsFragment(
     val retailer: Retailer,
     val status: ConnectionStatus,
-    val isCreatedByUser:  Boolean,
-    val onUpdateStatus: (status: ConnectionStatus) -> Unit
+    val connection: Connection?,
+    val onUpdateStatus: (status: ConnectionStatus, connId:ObjectId?) -> Unit
 ) : BottomSheetDialogFragment() {
 
     private var _binding: FragmentRetailerDetailsBinding? = null
     val binding: FragmentRetailerDetailsBinding
         get() = _binding!!
 
-    constructor(retailer: Retailer):this(retailer,ConnectionStatus.accepted,true,{})
+    constructor(retailer: Retailer):this(retailer,ConnectionStatus.accepted,null,{ status, connId ->  })
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,8 +44,11 @@ class RetailerDetailsFragment(
         bottomSheet.backgroundTintList = ColorStateList.valueOf(Color.TRANSPARENT)
         bottomSheet.setBackgroundColor(Color.TRANSPARENT)
 
-        binding.accept.isVisible = !isCreatedByUser
-        binding.decline.isVisible = !isCreatedByUser
+        connection?.let {
+            binding.accept.isVisible = !it.isCreatedByUser
+            binding.decline.isVisible = !it.isCreatedByUser
+        }
+
 
         binding.name.text = "Name:${retailer.name}"
         binding.email.text = "Email:${retailer.email}"
@@ -54,11 +60,13 @@ class RetailerDetailsFragment(
             binding.linear.isVisible = false
         }else{
             binding.decline.setOnClickListener {
-                onUpdateStatus(ConnectionStatus.rejected)
+                onUpdateStatus(ConnectionStatus.rejected, connection?.id)
                 dismiss()
             }
             binding.accept.setOnClickListener {
-                onUpdateStatus(ConnectionStatus.accepted)
+                Log.d("TAG","CONN ID RDF= ${connection?.id}")
+
+                onUpdateStatus(ConnectionStatus.accepted, connection?.id)
                 dismiss()
             }
         }
