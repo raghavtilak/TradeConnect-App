@@ -33,7 +33,12 @@ interface UserAPI {
 
 
     @GET("customer/my_retailers")
-    suspend fun getRetailerOfACustomers(@Query("email") email: String):Response<List<Retailer>>
+    suspend fun getRetailerOfACustomers(@Query("customerEmail") email: String):Response<List<Retailer>>
+
+    @GET("customer/my_transactions")
+    suspend fun getTransactionsOfCustomer():Response<List<SellItem>>
+
+
 
     @GET("retailer/customers/{retailerId}")
     suspend fun getCustomersOfARetailer(@Path("retailerId") retailerId: String):Response<List<Customer>>

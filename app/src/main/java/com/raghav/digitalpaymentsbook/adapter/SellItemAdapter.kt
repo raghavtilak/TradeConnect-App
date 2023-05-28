@@ -15,7 +15,7 @@ import java.text.SimpleDateFormat
 
 class SellItemAdapter (private val onItemClickListener: (retailer: SellItem)->Unit) : ListAdapter<SellItem, SellItemAdapter.ViewHolder>(COMPARATOR) {
 
-    class ViewHolder(val binding: ItemSellBinding) : RecyclerView.ViewHolder(binding.root)
+    class ViewHolder(val binding: ItemSellBinding, val parent:ViewGroup) : RecyclerView.ViewHolder(binding.root)
 
     companion object COMPARATOR : DiffUtil.ItemCallback<SellItem>() {
         override fun areItemsTheSame(oldItem: SellItem, newItem: SellItem): Boolean {
@@ -30,7 +30,7 @@ class SellItemAdapter (private val onItemClickListener: (retailer: SellItem)->Un
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemSellBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ViewHolder(binding)
+        return ViewHolder(binding,parent)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -38,7 +38,13 @@ class SellItemAdapter (private val onItemClickListener: (retailer: SellItem)->Un
         holder.binding.apply {
             val c = currentList[holder.adapterPosition]
 
-            if(c.isCustomerSale && c.toRetailer!=null){
+            if(c.isCreatedByUser)
+                icon.setImageDrawable(holder.parent.context.getDrawable(R.drawable.ic_baseline_arrow_outward_24))
+            else
+                icon.setImageDrawable(holder.parent.context.getDrawable(R.drawable.ic_baseline_arrow_inward_24))
+
+
+            if(!c.isCustomerSale && c.toRetailer!=null){
                 retailerName.text = c.toRetailer.name
                 businessName.text = c.toRetailer.businessName
                 price.text = "Price: ₹${c.totalPrice}"
@@ -49,7 +55,17 @@ class SellItemAdapter (private val onItemClickListener: (retailer: SellItem)->Un
                 batchCount.text = "Batch(s): ${c.batches.size}"
 
             }else{
+                retailerName.text = c.customerEmail ?: ""
+                businessName.text = c.customerName ?: ""
+                price.text = "Price: ₹${c.totalPrice}"
 
+                if(c.customerName!=null) {
+                    avatarText.text = if (c.customerName.contains(" "))
+                        "${c.customerName.split(" ")[0][0]}${c.customerName.split(" ")[1][0]}"
+                    else
+                        c.customerName[0].toString()
+                }
+                batchCount.text = "Batch(s): ${c.batches.size}"
             }
 
 

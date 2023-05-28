@@ -1,6 +1,7 @@
 package com.raghav.digitalpaymentsbook.ui.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -44,6 +45,8 @@ class ConnectionsFragment(private val connections: List<Connection>) : Fragment(
 
             if(connections.isNotEmpty()) {
 
+                val connectionId = connections.find { it.user == retailer }?.id
+                Log.d("TAG","${connectionId ?:"Connection id not found"}")
 
                 val frag = RetailerDetailsFragment(retailer, ConnectionStatus.pending, connections[0].isCreatedByUser) { status ->
                     lifecycleScope.launch {
@@ -51,7 +54,7 @@ class ConnectionsFragment(private val connections: List<Connection>) : Fragment(
                             val jsonObject = JSONObject()
                             jsonObject.put("status", status.name)
                             val body = jsonObject.toString().toRequestBody("application/json".toMediaTypeOrNull())
-                            RetrofitHelper.getInstance(requireActivity()).updateConnectionReq(retailer.id,body)
+                            RetrofitHelper.getInstance(requireActivity()).updateConnectionReq(connectionId!!,body)
                         }
                         val res = job.await()
                         if (res.isSuccessful) {
