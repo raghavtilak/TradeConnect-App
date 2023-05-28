@@ -60,10 +60,9 @@
                         android:id="@+id/editTextCustName"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:imeOptions="actionSearch"
-                        android:inputType="numberSigned"
+                        android:inputType="text"
                         android:lines="1"
-                        android:maxLength="10"
+                        android:maxLength="30"
                         android:maxLines="1"
                         android:textSize="18sp" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -96,10 +95,9 @@
                         android:id="@+id/editTextCustEmail"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:imeOptions="actionSearch"
-                        android:inputType="numberSigned"
+                        android:inputType="textEmailAddress"
                         android:lines="1"
-                        android:maxLength="10"
+                        android:maxLength="50"
                         android:maxLines="1"
                         android:textSize="18sp" />
                 </com.google.android.material.textfield.TextInputLayout>

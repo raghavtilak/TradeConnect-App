@@ -52,13 +52,14 @@ class CreateSellActivity : AppCompatActivity() {
 
     var products: MutableList<RetailerProduct> = mutableListOf()
 
+    var role : UserRole = UserRole.Retailer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityCreateSellBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val role = intent.getSerializableExtra("role") as UserRole
+        role = intent.getSerializableExtra("role") as UserRole
 
         when(role){
             UserRole.Retailer -> {
@@ -339,72 +340,161 @@ class CreateSellActivity : AppCompatActivity() {
         }
         binding.createOrder.setOnClickListener {
 
-            if (orderBatchAdapter.itemCount == 0) {
-                Toast.makeText(this, "There are no products", Toast.LENGTH_SHORT).show()
-            }else if(binding.editTextPaid.text.isNullOrBlank()){
-                binding.TextFieldPaid.isErrorEnabled = true
-                binding.TextFieldPaid.error = "This amount is required"
+            when(role){
+                UserRole.Retailer -> {
+                    if (orderBatchAdapter.itemCount == 0) {
+                        Toast.makeText(this, "There are no products", Toast.LENGTH_SHORT).show()
+                    }else if(binding.editTextPaid.text.isNullOrBlank()){
+                        binding.TextFieldPaid.isErrorEnabled = true
+                        binding.TextFieldPaid.error = "This amount is required"
 //                Toast.makeText(this, "There are no products", Toast.LENGTH_SHORT).show()
-            }else if(binding.editTextPaid.text.toString().toInt() > orderBatchAdapter.currentList.sumOf { it.sellingPrice }){
-                Toast.makeText(this, "Paid amount can't be greater than total sell amount", Toast.LENGTH_LONG).show()
+                    }else if(binding.editTextPaid.text.toString().toInt() > orderBatchAdapter.currentList.sumOf { it.sellingPrice }){
+                        Toast.makeText(this, "Paid amount can't be greater than total sell amount", Toast.LENGTH_LONG).show()
 
-            }
-            else {
-
-
-                lifecycleScope.launch(handler) {
-
-                    val order = JSONObject()
-                    order.put(
-                        "toRetailerId",
-                        (binding.chooseRet.selectedItem as Retailer).id.toHexString()
-                    )
-                    order.put(
-                        "totalPrice",
-                        orderBatchAdapter.currentList.sumOf { it.sellingPrice })
-
-                    //TODO Paid
-                    order.put(
-                        "paid",
-                        binding.editTextPaid.text.toString().toInt())
-
-
-                    val batches = JSONArray()
-                    orderBatchAdapter.currentList.forEach {
-                        val batch = JSONObject()
-                        batch.put("batchNo", it.batchNo)
-                        batch.put("quantity", it.quantity)
-                        batch.put("price", it.sellingPrice)
-                        batches.put(batch)
                     }
-                    order.put("batches", batches)
+                    else {
 
-                    val body =
-                        order.toString().toRequestBody("application/json".toMediaTypeOrNull())
 
-                    val job =
-                        async {
-                            RetrofitHelper.getInstance(this@CreateSellActivity)
-                                .createSell(body)
+                        lifecycleScope.launch(handler) {
+
+                            val order = JSONObject()
+                            order.put(
+                                "toRetailerId",
+                                (binding.chooseRet.selectedItem as Retailer).id.toHexString()
+                            )
+                            order.put(
+                                "totalPrice",
+                                orderBatchAdapter.currentList.sumOf { it.sellingPrice })
+
+                            //TODO Paid
+                            order.put(
+                                "paid",
+                                binding.editTextPaid.text.toString().toInt())
+
+
+                            val batches = JSONArray()
+                            orderBatchAdapter.currentList.forEach {
+                                val batch = JSONObject()
+                                batch.put("batchNo", it.batchNo)
+                                batch.put("quantity", it.quantity)
+                                batch.put("price", it.sellingPrice)
+                                batches.put(batch)
+                            }
+                            order.put("batches", batches)
+
+                            val body =
+                                order.toString().toRequestBody("application/json".toMediaTypeOrNull())
+
+                            val job =
+                                async {
+                                    RetrofitHelper.getInstance(this@CreateSellActivity)
+                                        .createSell(body)
+                                }
+                            val response = job.await()
+                            if (response.isSuccessful && response.body() != null) {
+                                Toast.makeText(
+                                    this@CreateSellActivity,
+                                    response.body()?.message,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                finish()
+                            } else {
+                                Toast.makeText(
+                                    this@CreateSellActivity,
+                                    response.body()?.error,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         }
-                    val response = job.await()
-                    if (response.isSuccessful && response.body() != null) {
-                        Toast.makeText(
-                            this@CreateSellActivity,
-                            response.body()?.message,
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        finish()
-                    } else {
-                        Toast.makeText(
-                            this@CreateSellActivity,
-                            response.body()?.error,
-                            Toast.LENGTH_SHORT
-                        ).show()
+
                     }
                 }
+                UserRole.Customer -> {
+                    if (orderBatchAdapter.itemCount == 0) {
+                        Toast.makeText(this, "There are no products", Toast.LENGTH_SHORT).show()
+                    }else if(binding.editTextPaid.text.isNullOrBlank()){
+                        binding.TextFieldPaid.isErrorEnabled = true
+                        binding.TextFieldPaid.error = "This amount is required"
+//                Toast.makeText(this, "There are no products", Toast.LENGTH_SHORT).show()
+                    }else if(binding.editTextPaid.text.toString().toInt() > orderBatchAdapter.currentList.sumOf { it.sellingPrice }){
+                        Toast.makeText(this, "Paid amount can't be greater than total sell amount", Toast.LENGTH_LONG).show()
 
+                    }
+                    else if(binding.editTextCustName.text.isNullOrBlank()){
+                        binding.TextFieldCustName.isErrorEnabled = true
+                        binding.TextFieldCustName.error = "Name required"
+                    }
+                    else if(binding.editTextCustEmail.text.isNullOrBlank()){
+                        binding.TextFieldCustEmail.isErrorEnabled = true
+                        binding.TextFieldCustEmail.error = "Email is required"
+                    }
+                    else {
+
+
+                        lifecycleScope.launch(handler) {
+
+                            val order = JSONObject()
+                            order.put(
+                                "isCustomerSale",
+                                true
+                            )
+                            order.put(
+                                "totalPrice",
+                                orderBatchAdapter.currentList.sumOf { it.sellingPrice })
+
+                            //TODO Paid
+                            order.put(
+                                "paid",
+                                binding.editTextPaid.text.toString().toInt())
+
+                            order.put(
+                                "customerEmail",
+                                binding.editTextCustEmail.text.toString())
+
+                            order.put(
+                                "customerName",
+                                binding.editTextCustName.text.toString())
+
+
+                            val batches = JSONArray()
+                            orderBatchAdapter.currentList.forEach {
+                                val batch = JSONObject()
+                                batch.put("batchNo", it.batchNo)
+                                batch.put("quantity", it.quantity)
+                                batch.put("price", it.sellingPrice)
+                                batches.put(batch)
+                            }
+                            order.put("batches", batches)
+
+                            val body =
+                                order.toString().toRequestBody("application/json".toMediaTypeOrNull())
+
+                            val job =
+                                async {
+                                    RetrofitHelper.getInstance(this@CreateSellActivity)
+                                        .createSell(body)
+                                }
+                            val response = job.await()
+                            if (response.isSuccessful && response.body() != null) {
+                                Toast.makeText(
+                                    this@CreateSellActivity,
+                                    response.body()?.message,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                finish()
+                            } else {
+                                Toast.makeText(
+                                    this@CreateSellActivity,
+                                    response.body()?.error,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+
+                    }
+                }
             }
+
         }
     }
 }
