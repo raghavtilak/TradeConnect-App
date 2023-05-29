@@ -64,6 +64,10 @@ interface UserAPI {
     @PUT("retailer/update_connection_req/{id}")
     suspend fun updateConnectionReq(@Path("id") id:ObjectId,@Body body : RequestBody):Response<ServerResponse>
 
+    @PUT("retailer/{id}/update_sale")
+    suspend fun updateSell(@Path("id") id:ObjectId,@Body body : RequestBody):Response<ServerResponse>
+
+
     @GET("retailer/my_sells")
     suspend fun mySells():Response<List<SellItem>>
 

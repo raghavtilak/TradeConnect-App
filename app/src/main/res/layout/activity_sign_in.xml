@@ -132,7 +132,7 @@
             android:layout_alignParentTop="true"
             android:layout_marginStart="20dp"
             android:layout_marginTop="20dp"
-            android:text="Digital\nPayments Book"
+            android:text="TradeConnect"
             android:textColor="@color/colorSecondary"
             android:textSize="42sp"
             android:textStyle="bold" />

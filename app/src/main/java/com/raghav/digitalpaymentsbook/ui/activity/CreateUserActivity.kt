@@ -295,7 +295,7 @@ class CreateUserActivity : AppCompatActivity() {
         binding.customerLayout.visibility = View.GONE
         binding.retailerLayout.visibility = View.VISIBLE
 
-        binding.phoneNo.text = Editable.Factory.getInstance().newEditable(user!!.phoneNumber)
+        binding.retphoneNo.text = Editable.Factory.getInstance().newEditable(user!!.phoneNumber)
 
         binding.retailerEmailCard.setOnClickListener {
 

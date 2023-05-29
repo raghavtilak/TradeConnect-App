@@ -38,7 +38,7 @@ class MySellsActivity : AppCompatActivity() {
         binding.recyclerView.layoutManager = LinearLayoutManager(this@MySellsActivity)
 
         adapter = SellItemAdapter {
-            val frag = BatchsDetailContainerFragment(false)
+            val frag = BatchsDetailContainerFragment(false,it)
             val bundle = Bundle()
             bundle.putParcelableArrayList("batches", ArrayList(it.batches))
             frag.arguments = bundle
