@@ -46,9 +46,9 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp"
+        android:layout_marginVertical="20dp"
         android:background="@drawable/rounded_corners"
-        android:layout_marginVertical="20dp">
+        android:padding="8dp">
 
         <ImageView
             android:id="@+id/retImage"
@@ -95,34 +95,34 @@
 
         <LinearLayout
             android:id="@+id/linear"
-            android:layout_marginStart="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/name"
-            >
-        <TextView
-            android:id="@+id/createdOrders"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="4500"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:drawableEndCompat="@drawable/ic_baseline_arrow_outward_24"
-            app:drawableTint="@color/green" />
+            app:layout_constraintTop_toBottomOf="@id/name">
 
-        <TextView
-            android:id="@+id/receivedOrders"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="4500"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:drawableEndCompat="@drawable/ic_baseline_arrow_inward_24"
-            app:drawableTint="@color/red" />
+            <TextView
+                android:id="@+id/createdOrders"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="4500"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:drawableEndCompat="@drawable/ic_baseline_arrow_outward_24"
+                app:drawableTint="@color/green" />
+
+            <TextView
+                android:id="@+id/receivedOrders"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="4500"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:drawableEndCompat="@drawable/ic_baseline_arrow_inward_24"
+                app:drawableTint="@color/red" />
         </LinearLayout>
 
         <TextView
@@ -135,6 +135,12 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@id/linear"
             app:layout_constraintTop_toBottomOf="@id/linear" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/retGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="noOfConnections,t2,linear,t1" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -150,6 +156,7 @@
 
 
             <LinearLayout
+                android:id="@+id/linear3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
@@ -246,6 +253,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/linear2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
@@ -270,6 +278,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/linear1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"

@@ -101,6 +101,11 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
+            binding.profile.setOnClickListener {
+                startActivity(Intent(this@MainActivity, ProfileActivity::class.java))
+
+            }
+
             askNotificationPermission()
 //                getFcmToken()
         }
@@ -196,10 +201,6 @@ class MainActivity : AppCompatActivity() {
         }
         binding.myConnections.setOnClickListener {
             startActivity(Intent(this@MainActivity, MyConnectionsActivity::class.java))
-
-        }
-        binding.profile.setOnClickListener {
-            startActivity(Intent(this@MainActivity, ProfileActivity::class.java))
 
         }
 
