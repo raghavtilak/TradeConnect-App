@@ -71,7 +71,7 @@ class RetailerDetailsFragment(
             }
         }
         //TODO: show business type
-        binding.businessType.text = "Business Name:${retailer.businessType}"
+        binding.businessType.text = "Business Type:${retailer.businessType}"
     }
 
     override fun onDestroyView() {

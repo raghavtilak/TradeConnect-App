@@ -61,7 +61,7 @@ class MySellsActivity : AppCompatActivity() {
                 startActivity(Intent(this,CreateSellActivity::class.java).putExtra("role",UserRole.Retailer))
             })
             roleDialog.show(supportFragmentManager, "roleDialog")
-            roleDialog.isCancelable = false
+            roleDialog.isCancelable = true
         }
     }
 

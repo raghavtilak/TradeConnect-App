@@ -58,6 +58,7 @@ class ViewStoreActivity : AppCompatActivity() {
             val body =
                 jsonObject.toString().toRequestBody("application/json".toMediaTypeOrNull())
 
+            Log.d("TAG","BAT= ${jsonObject}")
             lifecycleScope.launch {
                 val job = async {
                     RetrofitHelper.getInstance(this@ViewStoreActivity)

@@ -67,12 +67,10 @@
         android:layout_height="30dp"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
-        android:rotation="225"
         android:src="@drawable/ic_baseline_arrow_downward_24"
         app:layout_constraintBottom_toBottomOf="@+id/type"
         app:layout_constraintStart_toEndOf="@+id/type"
-        app:layout_constraintTop_toTopOf="@+id/type"
-        app:tint="@color/green" />
+        app:layout_constraintTop_toTopOf="@+id/type" />
 
     <TextView
         android:id="@+id/businessName"

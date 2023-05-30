@@ -96,6 +96,9 @@ class BatchsDetailContainerFragment(val showUpdateOption:Boolean, val sellItem:S
         val binding = DialogUpdateSellBinding.inflate(layoutInflater)
         builder.setView(binding.root)
 
+        binding.total.text = "Total: ₹${sellItem.totalPrice.toString()}"
+        binding.due.text = "Current Due: ₹${sellItem.due.toString()}"
+
         binding.accept.setOnClickListener {
             if(binding.editTextPaid.text.isNullOrBlank()){
                 binding.TextFieldPaid.isErrorEnabled = true

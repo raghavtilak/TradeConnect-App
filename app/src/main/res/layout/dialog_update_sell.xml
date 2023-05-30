@@ -4,6 +4,7 @@
     android:layout_height="wrap_content"
     android:padding="15dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:backgroundTint="@color/colorPrimaryDark"
     android:background="@drawable/rounded_corners">
 
     <TextView
@@ -29,7 +30,7 @@
         app:layout_constraintTop_toBottomOf="@+id/t1"
         app:layout_constraintStart_toStartOf="parent"
         android:textColor="@color/white"
-        android:text="Toatl:  ₹45000"/>
+        android:text="Total:  ₹45000"/>
 
     <TextView
         android:id="@+id/due"
