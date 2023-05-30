@@ -45,11 +45,28 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <androidx.appcompat.widget.AppCompatSpinner
+<!--                <androidx.appcompat.widget.AppCompatSpinner-->
+<!--                    android:id="@+id/chooseRet"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="56dp"-->
+<!--                    android:entries="@array/sample" />-->
+                <com.skydoves.powerspinner.PowerSpinnerView
                     android:id="@+id/chooseRet"
                     android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:entries="@array/sample" />
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:hint="Choose Retailer"
+                    android:padding="10dp"
+                    android:textSize="14.5sp"
+                    app:spinner_arrow_gravity="end"
+                    app:spinner_arrow_padding="8dp"
+                    app:spinner_divider_color="@color/white"
+                    app:spinner_divider_show="true"
+                    app:spinner_divider_size="0.4dp"
+                    app:spinner_item_height="46dp"
+                    app:spinner_popup_animation="dropdown"
+                    app:spinner_popup_background="@color/colorPrimaryDark"
+                    app:spinner_popup_elevation="14dp" />
 
             </com.google.android.material.card.MaterialCardView>
 
@@ -62,11 +79,29 @@
                 app:cardElevation="8dp"
                 app:layout_constraintTop_toBottomOf="@id/chooseRetCard">
 
-                <androidx.appcompat.widget.AppCompatSpinner
+<!--                <androidx.appcompat.widget.AppCompatSpinner-->
+<!--                    android:id="@+id/chooseProduct"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="56dp"-->
+<!--                    android:entries="@array/sample2" />-->
+
+                <com.skydoves.powerspinner.PowerSpinnerView
                     android:id="@+id/chooseProduct"
                     android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:entries="@array/sample2" />
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:hint="Choose Retailer"
+                    android:padding="10dp"
+                    android:textSize="14.5sp"
+                    app:spinner_arrow_gravity="end"
+                    app:spinner_arrow_padding="8dp"
+                    app:spinner_divider_color="@color/white"
+                    app:spinner_divider_show="true"
+                    app:spinner_divider_size="0.4dp"
+                    app:spinner_item_height="46dp"
+                    app:spinner_popup_animation="dropdown"
+                    app:spinner_popup_background="@color/colorPrimaryDark"
+                    app:spinner_popup_elevation="14dp" />
 
 
             </com.google.android.material.card.MaterialCardView>
@@ -86,11 +121,30 @@
                 app:layout_constraintTop_toBottomOf="@id/chooseProductCard">
 
 
-                <androidx.appcompat.widget.AppCompatSpinner
+<!--                <androidx.appcompat.widget.AppCompatSpinner-->
+<!--                    android:id="@+id/chooseBatch"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="56dp"-->
+<!--                    android:entries="@array/sample3" />-->
+
+                <com.skydoves.powerspinner.PowerSpinnerView
                     android:id="@+id/chooseBatch"
                     android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:entries="@array/sample3" />
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:hint="Choose Retailer"
+                    android:padding="10dp"
+                    android:textSize="14.5sp"
+                    app:spinner_arrow_gravity="end"
+                    app:spinner_arrow_padding="8dp"
+                    app:spinner_divider_color="@color/white"
+                    app:spinner_divider_show="true"
+                    app:spinner_divider_size="0.4dp"
+                    app:spinner_item_height="46dp"
+                    app:spinner_popup_animation="dropdown"
+                    app:spinner_popup_background="@color/colorPrimaryDark"
+                    app:spinner_popup_elevation="14dp" />
+
 
             </com.google.android.material.card.MaterialCardView>
 

@@ -1,14 +1,19 @@
 package com.raghav.digitalpaymentsbook.ui.activity
 
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -320,11 +325,40 @@ class CreateUserActivity : AppCompatActivity() {
 
                 businessTypes.addAll(response.body()!!)
 
-                binding.busType.adapter = ArrayAdapter(
+                binding.busType.adapter = object : ArrayAdapter<BusinessTypes>(
                     this@CreateUserActivity,
-                    android.R.layout.simple_spinner_item,
+                    android.R.layout.simple_dropdown_item_1line,
                     response.body()!!.toMutableList()
-                )
+                ){
+                    override fun getView(
+                        position: Int,
+                        convertView: View?,
+                        parent: ViewGroup
+                    ): View {
+                        return initView(position, convertView, parent)
+                    }
+
+                    override fun getDropDownView(
+                        position: Int,
+                        convertView: View?,
+                        parent: ViewGroup
+                    ): View {
+                        return initView(position, convertView, parent)
+                    }
+
+                    private fun initView(
+                        position: Int,
+                        convertView: View?,
+                        parent: ViewGroup
+                    ):View{
+                        val textView = TextView(this@CreateUserActivity)
+                        val c = getItem(position)!!
+                        textView.text = c.name
+                        textView.setTextColor(ColorStateList.valueOf(Color.BLACK))
+                        textView.updatePadding(20,20,20,20)
+                        return textView
+                    }
+                }
 
             } else {
                 Toast.makeText(this@CreateUserActivity, "Couldn't load businness types", Toast.LENGTH_SHORT).show()

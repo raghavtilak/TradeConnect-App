@@ -10,7 +10,7 @@ import java.util.*
 data class Batch(
 
     @SerializedName("_id")
-    val id: ObjectId,
+    val id: ObjectId?,
 
     val batchNo: String,
     val MRP: Int,

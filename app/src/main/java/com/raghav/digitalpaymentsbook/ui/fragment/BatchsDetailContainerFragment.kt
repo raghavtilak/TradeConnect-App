@@ -111,7 +111,7 @@ class BatchsDetailContainerFragment(val showUpdateOption:Boolean, val sellItem:S
                 loadingDialog.show(parentFragmentManager,"loading")
 
                 viewLifecycleOwner.lifecycleScope.launch(handler){
-                    lifecycleScope.launch {
+                    lifecycleScope.launch(handler) {
                         val jo = JSONObject()
                         jo.put("totalPrice", sellItem.totalPrice)
                         jo.put("paid", binding.editTextPaid.text.toString().toInt())
@@ -129,7 +129,7 @@ class BatchsDetailContainerFragment(val showUpdateOption:Boolean, val sellItem:S
                         } else {
                             Toast.makeText(requireActivity(), response.body()!!.error, Toast.LENGTH_SHORT).show()
                             loadingDialog.dismiss()
-                            Log.d("TAG", "Couldn't load businness types")
+                            Log.d("TAG", "Couldn't update the sell")
                         }
                     }
                 }

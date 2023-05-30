@@ -63,7 +63,9 @@ class AddConnectionFragment : BottomSheetDialogFragment() {
                     CreateConnection(it.id,"none")) }
                 val res = job.await()
                 if(res.isSuccessful && res.body()!=null){
-                    Toast.makeText(requireActivity(), res.message(), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireActivity(), res.body()!!.message, Toast.LENGTH_SHORT).show()
+                }else{
+                    Toast.makeText(requireActivity(), res.body()!!.error, Toast.LENGTH_SHORT).show()
                 }
                 dismiss()
             }

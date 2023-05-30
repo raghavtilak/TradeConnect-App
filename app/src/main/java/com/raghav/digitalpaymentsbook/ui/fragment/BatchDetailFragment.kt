@@ -40,7 +40,7 @@ class BatchDetailFragment(private val showUpdateOption: Boolean) : Fragment() {
         batch?.let {
 
 
-            binding.batchNo.text = "Batch No: ₹${it.batchNo}"
+            binding.batchNo.text = "Batch No: ${it.batchNo}"
             binding.mrp.text = "MRP: ₹${it.MRP}"
             it.mfg?.let { mfg ->
                 binding.mfgdate.text = "Mfg: ${SimpleDateFormat("dd/MM/yyyy").format(mfg)}"

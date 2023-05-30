@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.raghav.digitalpaymentsbook.adapter.BatchAdapter
 import com.raghav.digitalpaymentsbook.data.model.Batch
+import com.raghav.digitalpaymentsbook.data.model.Product
 import com.raghav.digitalpaymentsbook.data.model.Retailer
 import com.raghav.digitalpaymentsbook.data.model.apis.RetailerProduct
 import com.raghav.digitalpaymentsbook.data.model.enums.ConnectionStatus
@@ -50,9 +51,8 @@ class CreateSellActivity : AppCompatActivity() {
         )
     }
 
-    var products: MutableList<RetailerProduct> = mutableListOf()
-
     var role : UserRole = UserRole.Retailer
+    lateinit var prodAdapter: ArrayAdapter<RetailerProduct>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,7 +78,7 @@ class CreateSellActivity : AppCompatActivity() {
         }
 
         val retAdapter = object : ArrayAdapter<Retailer>(
-            this@CreateSellActivity, 0,
+            this@CreateSellActivity, android.R.layout.simple_dropdown_item_1line,
             mutableListOf()
         ) {
             override fun getView(
@@ -105,7 +105,7 @@ class CreateSellActivity : AppCompatActivity() {
                 val textView = TextView(this@CreateSellActivity)
                 val c = getItem(position)!!
                 textView.text = c.name
-                textView.updatePadding(20,0,0,0)
+                textView.updatePadding(20,20,20,20)
                 return textView
             }
             private fun initDropDownView(
@@ -131,8 +131,41 @@ class CreateSellActivity : AppCompatActivity() {
                 return binding.root
             }
         }
-
         binding.chooseRet.adapter = retAdapter
+
+        prodAdapter = object : ArrayAdapter<RetailerProduct>(
+            this@CreateSellActivity, android.R.layout.simple_dropdown_item_1line , mutableListOf()
+        ) {
+            override fun getView(
+                position: Int,
+                convertView: View?,
+                parent: ViewGroup
+            ): View {
+                return initView(position, convertView, parent)
+            }
+
+            override fun getDropDownView(
+                position: Int,
+                convertView: View?,
+                parent: ViewGroup
+            ): View {
+                return initView(position, convertView, parent)
+            }
+
+            private fun initView(
+                position: Int,
+                convertView: View?,
+                parent: ViewGroup
+            ):View{
+                val textView = TextView(this@CreateSellActivity)
+                val c = getItem(position)!!
+                textView.text = c.productName
+                textView.paint.isFakeBoldText = true
+                textView.updatePadding(20,20,20,20)
+                return textView
+            }
+        }
+        binding.chooseProduct.adapter = prodAdapter
 
         lifecycleScope.launch(handler) {
             loadingDialog.show(supportFragmentManager, "loading")
@@ -163,8 +196,8 @@ class CreateSellActivity : AppCompatActivity() {
                     retAdapter.addAll(res1.body()!!.map { it.user }.toMutableList())
 
                     if (res2.isSuccessful && res2.body() != null){
-                        products.clear()
-                        products.addAll(res2.body()!!)
+                        prodAdapter.clear()
+                        prodAdapter.addAll(res2.body()!!)
                         updateUi()
                     }else{
                         Toast.makeText(
@@ -187,15 +220,11 @@ class CreateSellActivity : AppCompatActivity() {
     }
 
     private fun updateUi() {
-        val prodAdapter = ArrayAdapter(
-            this@CreateSellActivity,
-            android.R.layout.simple_spinner_item,
-            mutableListOf("Choose Product")
-        )
-        binding.chooseProduct.adapter = prodAdapter
+
+
 
         val batchAdapter = object : ArrayAdapter<Batch>(
-            this@CreateSellActivity, 0,
+            this@CreateSellActivity, android.R.layout.simple_dropdown_item_1line,
             mutableListOf()
         ) {
             override fun getView(
@@ -222,7 +251,7 @@ class CreateSellActivity : AppCompatActivity() {
                 val textView = TextView(this@CreateSellActivity)
                 val c = getItem(position)!!
                 textView.text = getItem(position)!!.batchNo
-                textView.updatePadding(20,0,0,0)
+                textView.updatePadding(20,20,20,20)
                 return textView
             }
 
@@ -256,9 +285,9 @@ class CreateSellActivity : AppCompatActivity() {
                 position: Int,
                 id: Long
             ) {
-                if(products.isNotEmpty()) {
+                if(!prodAdapter.isEmpty) {
                     batchAdapter.clear()
-                    batchAdapter.addAll((products[binding.chooseProduct.selectedItemPosition]).batches)
+                    batchAdapter.addAll((binding.chooseProduct.selectedItem as RetailerProduct).batches)
                 }
                 binding.productDetails.isVisible = false
             }
@@ -291,7 +320,7 @@ class CreateSellActivity : AppCompatActivity() {
                 binding.TextFieldQuantity.isErrorEnabled = false
                 binding.productDetails.isVisible = true
                 with(binding) {
-                    val c = products[binding.chooseProduct.selectedItemPosition].batches[position]
+                    val c = (binding.chooseProduct.selectedItem as RetailerProduct).batches[position]
                     productName.text = c.productName
                     quantity.text = "Quantity: ${c.quantity}"
                     mrp.text = "MRP: ₹${c.MRP}"
@@ -302,10 +331,6 @@ class CreateSellActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
-
-//
-        prodAdapter.clear()
-        prodAdapter.addAll(products.map { it.productName })
 
 
         var orderBatchAdapter: BatchAdapter? = null

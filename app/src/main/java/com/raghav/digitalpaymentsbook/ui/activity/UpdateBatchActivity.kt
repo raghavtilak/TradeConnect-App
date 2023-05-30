@@ -93,7 +93,7 @@ class UpdateBatchActivity : AppCompatActivity() {
                 lifecycleScope.launch {
                     val job = async {
                         RetrofitHelper.getInstance(this@UpdateBatchActivity)
-                            .updateBatch(batch.id,body)
+                            .updateBatch(batch.id!!,body)
                     }
                     val res = job.await()
                     if (res.isSuccessful && res.body() != null) {

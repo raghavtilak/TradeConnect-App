@@ -75,4 +75,7 @@ dependencies {
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01"
 
+        implementation "androidx.preference:preference-ktx:1.2.0"
+
+    implementation "com.github.skydoves:powerspinner:1.2.6"
 }
