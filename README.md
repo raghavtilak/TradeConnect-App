@@ -11,19 +11,21 @@ TradeConnect enables Retailers to manage the supply chain seamlessly through the
 
 ## Documentation
 
-- [Abstract](https://linktodocumentation)
-- [SRS](https://linktodocumentation)
-- [Pproject Report](https://linktodocumentation)
+- [Abstract](https://github.com/raghavtilak/TradeConnect/blob/master/docs/AbstractTradeConnect.pdf)
+- [SRS](https://github.com/raghavtilak/TradeConnect/blob/master/docs/SRSTradeConnect.pdf)
+- [Pproject Report](https://github.com/raghavtilak/TradeConnect/blob/master/docs/ProjectReportTradeConnect.pdf)
 
 ## Demo
 
 | SignUp |  SignIn |
 |---     |---      |
-|        |         |
+|![signup](https://github.com/raghavtilak/TradeConnect/assets/74963954/b175c152-621f-4edf-ada5-ac216f4cef81)|![signin](https://github.com/raghavtilak/TradeConnect/assets/74963954/bc740353-dc12-4c47-80cc-682057b12356)|
 
 | Create Account |  Home Screen |
 |---     |---      |
-|        |         |
+|![createretailer](https://github.com/raghavtilak/TradeConnect/assets/74963954/70c580e5-d502-49a6-ad57-696539c8fa13)
+        |![homescreen](https://github.com/raghavtilak/TradeConnect/assets/74963954/e09f67e6-812f-4771-a058-bc375292d1e4)
+         |
 
 
 |My Orders | My Connections|
