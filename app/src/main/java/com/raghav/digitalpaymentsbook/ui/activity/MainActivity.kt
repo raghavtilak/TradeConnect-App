@@ -24,6 +24,7 @@ import com.raghav.digitalpaymentsbook.util.*
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.onEmpty
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class MainActivity : AppCompatActivity() {
 //    , CustomerAdapter.OnItemClickListener,
@@ -107,7 +108,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             askNotificationPermission()
-//                getFcmToken()
+                lifecycleScope.launch { getFcmToken() }
         }
 
     }
@@ -224,25 +225,14 @@ class MainActivity : AppCompatActivity() {
 */
 
 
-    private fun getFcmToken():String?{
-        var token :String? = null
-
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.w("TAG", "Fetching FCM registration token failed", task.exception)
-
-                return@addOnCompleteListener
-            }
-
-            // Get new FCM registration token
-            token = task.result
-
-            // Log and toast
-            Log.d("TAG", "Got token : $token")
-
+    private suspend fun getFcmToken(): String {
+        return try {
+            Log.d("TAG", "Got token : ${FirebaseMessaging.getInstance().token.await()}")
+            FirebaseMessaging.getInstance().token.await()
+        } catch (e: Exception) {
+            Log.w("TAG", "Fetching FCM registration token failed" + e.printStackTrace())
+            ""
         }
-        return token
     }
-
 
 }

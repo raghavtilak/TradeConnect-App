@@ -32,6 +32,10 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
 class SignInActivity : AppCompatActivity() {
@@ -261,6 +265,7 @@ class SignInActivity : AppCompatActivity() {
 
         if (result1.isSuccessful && result1.body() != null) {
 
+
             val job2 = scope.async {
                 RetrofitHelper.getInstance(this@SignInActivity)
                     .getUser(retailerSignIn.email,retailerSignIn.phone)
@@ -310,6 +315,28 @@ class SignInActivity : AppCompatActivity() {
                         MainActivity::class.java
                     )
                 )
+
+                val token =  getFcmToken()
+                val jo = JSONObject()
+                jo.put("registrationToken", token)
+
+                val body =
+                    jo.toString().toRequestBody("application/json".toMediaTypeOrNull())
+
+
+                scope.launch {
+                    val job = async {
+                        RetrofitHelper.getInstance(this@SignInActivity)
+                            .updateNotificationToken(body)
+                    }
+                    val res = job.await()
+                    if (res.isSuccessful && res.body() != null) {
+                        Log.d("TAG", "Updated token")
+                    } else {
+                        Log.d("TAG", "Can't update token")
+                    }
+                }
+
                 finish()
             }else{
                 Toast.makeText(
@@ -330,25 +357,14 @@ class SignInActivity : AppCompatActivity() {
     }
 
 
-    private fun getFcmToken():String?{
-        var token :String? = null
-
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.w("TAG", "Fetching FCM registration token failed", task.exception)
-
-                return@addOnCompleteListener
-            }
-
-            // Get new FCM registration token
-            token = task.result
-
-            // Log and toast
-            Log.d("TAG", "Got token : $token")
-
+    private suspend fun getFcmToken(): String {
+        return try {
+            Log.d("TAG", "Got token : ${FirebaseMessaging.getInstance().token.await()}")
+            FirebaseMessaging.getInstance().token.await()
+        } catch (e: Exception) {
+            Log.w("TAG", "Fetching FCM registration token failed" + e.printStackTrace())
+            ""
         }
-        return token
     }
-
 
 }

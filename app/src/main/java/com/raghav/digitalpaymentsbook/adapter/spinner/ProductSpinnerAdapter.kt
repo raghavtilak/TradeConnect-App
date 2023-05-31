@@ -3,6 +3,7 @@ package com.raghav.digitalpaymentsbook.adapter.spinner
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.raghav.digitalpaymentsbook.data.model.Product
 import com.raghav.digitalpaymentsbook.data.model.apis.RetailerProduct
 import com.raghav.digitalpaymentsbook.databinding.ItemProductBinding
 import com.raghav.digitalpaymentsbook.databinding.ItemRetailerBinding
@@ -11,25 +12,42 @@ import com.skydoves.powerspinner.PowerSpinnerInterface
 import com.skydoves.powerspinner.PowerSpinnerView
 
 class ProductSpinnerAdapter(
-    powerSpinnerView: PowerSpinnerView,
-    val spinnerItems: MutableList<RetailerProduct>
-) : RecyclerView.Adapter<ProductSpinnerAdapter.ProductSpinnerViewHolder>(),
+    powerSpinnerView: PowerSpinnerView
+) : RecyclerView.Adapter<ProductSpinnerAdapter.IconSpinnerViewHolder>(),
     PowerSpinnerInterface<RetailerProduct> {
 
-    private val NO_SELECTED_INDEX: Int = 0
+    private val NO_SELECTED_INDEX: Int = -1
     override var index: Int = powerSpinnerView.selectedIndex
     override val spinnerView: PowerSpinnerView = powerSpinnerView
     override var onSpinnerItemSelectedListener: OnSpinnerItemSelectedListener<RetailerProduct>? = null
 
-    class ProductSpinnerViewHolder(val binding: ItemProductBinding) : RecyclerView.ViewHolder(binding.root)
+    val spinnerItems: MutableList<RetailerProduct> = arrayListOf()
 
-    override fun onBindViewHolder(holder: ProductSpinnerViewHolder, position: Int) {
-        holder.itemView.setOnClickListener {
-            notifyItemSelected(position)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): IconSpinnerViewHolder {
+        val binding =
+            ItemProductBinding.inflate(
+                LayoutInflater.from(parent.context), parent,
+                false
+            )
+        return IconSpinnerViewHolder(binding).apply {
+            binding.root.setOnClickListener {
+                val position = adapterPosition.takeIf { it != RecyclerView.NO_POSITION }
+                    ?: return@setOnClickListener
+                notifyItemSelected(position)
+            }
         }
     }
 
-    // You must call the `spinnerView.notifyItemSelected` method to let `PowerSpinnerView` know the item is changed.
+    override fun onBindViewHolder(holder: IconSpinnerViewHolder, position: Int) {
+        holder.bind(spinnerItems[position], spinnerView)
+    }
+
+    override fun setItems(itemList: List<RetailerProduct>) {
+        this.spinnerItems.clear()
+        this.spinnerItems.addAll(itemList)
+        notifyDataSetChanged()
+    }
+
     override fun notifyItemSelected(index: Int) {
         if (index == NO_SELECTED_INDEX) return
         val oldIndex = this.index
@@ -43,19 +61,17 @@ class ProductSpinnerAdapter(
         )
     }
 
-    override fun getItemCount(): Int {
-        return spinnerItems.size
+    override fun getItemCount() = this.spinnerItems.size
+
+    class IconSpinnerViewHolder(private val binding: ItemProductBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(item: RetailerProduct, spinnerView: PowerSpinnerView) {
+            // do something using a custom item.
+            with(binding) {
+                val c = item
+                productName.text = c.productName
+            }
+        }
     }
-
-    override fun setItems(itemList: List<RetailerProduct>) {
-        spinnerItems.clear()
-        spinnerItems.addAll(itemList)
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductSpinnerViewHolder {
-        val binding = ItemProductBinding.inflate(LayoutInflater.from(parent.context),parent,false)
-        return ProductSpinnerViewHolder(binding)
-    }
-
-
 }

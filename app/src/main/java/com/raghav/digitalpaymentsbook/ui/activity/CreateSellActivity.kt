@@ -18,6 +18,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.raghav.digitalpaymentsbook.adapter.BatchAdapter
+import com.raghav.digitalpaymentsbook.adapter.spinner.BatchSpinnerAdapter
+import com.raghav.digitalpaymentsbook.adapter.spinner.ProductSpinnerAdapter
+import com.raghav.digitalpaymentsbook.adapter.spinner.RetailerSpinnerAdapter
 import com.raghav.digitalpaymentsbook.data.model.Batch
 import com.raghav.digitalpaymentsbook.data.model.Product
 import com.raghav.digitalpaymentsbook.data.model.Retailer
@@ -52,8 +55,15 @@ class CreateSellActivity : AppCompatActivity() {
     }
 
     var role : UserRole = UserRole.Retailer
-    lateinit var prodAdapter: ArrayAdapter<RetailerProduct>
+//    lateinit var prodAdapter: ArrayAdapter<RetailerProduct>
 
+    var orderBatchAdapter: BatchAdapter? = null
+
+    lateinit var retAdapter : RetailerSpinnerAdapter
+    lateinit var prodAdapter : ProductSpinnerAdapter
+    lateinit var batchAdapter : BatchSpinnerAdapter
+
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityCreateSellBinding.inflate(layoutInflater)
@@ -77,96 +87,35 @@ class CreateSellActivity : AppCompatActivity() {
             }
         }
 
-        val retAdapter = object : ArrayAdapter<Retailer>(
-            this@CreateSellActivity, android.R.layout.simple_dropdown_item_1line,
-            mutableListOf()
-        ) {
-            override fun getView(
-                position: Int,
-                convertView: View?,
-                parent: ViewGroup
-            ): View {
-                return initGetView(position, convertView, parent)
-            }
 
-            override fun getDropDownView(
-                position: Int,
-                convertView: View?,
-                parent: ViewGroup
-            ): View {
-                return initDropDownView(position, convertView, parent)
-            }
+        retAdapter = RetailerSpinnerAdapter(binding.chooseRet)
+        prodAdapter = ProductSpinnerAdapter(binding.chooseProduct)
+        batchAdapter = BatchSpinnerAdapter(binding.chooseBatch)
 
-            private fun initGetView(
-                position: Int,
-                convertView: View?,
-                parent: ViewGroup
-            ):View{
-                val textView = TextView(this@CreateSellActivity)
-                val c = getItem(position)!!
-                textView.text = c.name
-                textView.updatePadding(20,20,20,20)
-                return textView
-            }
-            private fun initDropDownView(
-                position: Int,
-                convertView: View?,
-                parent: ViewGroup
-            ): View {
-                val binding = ItemRetailerBinding.inflate(
-                    LayoutInflater.from(parent.context),
-                    parent,
-                    false
-                )
-                with(binding) {
-                    val c = getItem(position)!!
-                    retailerName.text = c.name
-                    businessName.text = c.businessName
-                    phone.text = c.phone
-                    avatarText.text = if (c.businessName.contains(" "))
-                        "${c.businessName.split(" ")[0][0]}${c.businessName.split(" ")[1][0]}"
-                    else
-                        c.businessName[0].toString()
-                }
-                return binding.root
-            }
+        binding.chooseRet.apply {
+            setSpinnerAdapter(retAdapter)
+            setItems(mutableListOf<Retailer>())
+            getSpinnerRecyclerView().layoutManager = LinearLayoutManager(context)
+//            selectItemByIndex(0) // select a default item.
+            lifecycleOwner = this@CreateSellActivity
         }
-        binding.chooseRet.adapter = retAdapter
 
-        prodAdapter = object : ArrayAdapter<RetailerProduct>(
-            this@CreateSellActivity, android.R.layout.simple_dropdown_item_1line , mutableListOf()
-        ) {
-            override fun getView(
-                position: Int,
-                convertView: View?,
-                parent: ViewGroup
-            ): View {
-                return initView(position, convertView, parent)
-            }
-
-            override fun getDropDownView(
-                position: Int,
-                convertView: View?,
-                parent: ViewGroup
-            ): View {
-                return initView(position, convertView, parent)
-            }
-
-            private fun initView(
-                position: Int,
-                convertView: View?,
-                parent: ViewGroup
-            ):View{
-                val textView = TextView(this@CreateSellActivity)
-                val c = getItem(position)!!
-                textView.text = c.productName
-                textView.paint.isFakeBoldText = true
-                textView.updatePadding(20,20,20,20)
-                return textView
-            }
+        binding.chooseProduct.apply {
+            setSpinnerAdapter(prodAdapter)
+            setItems(mutableListOf<RetailerProduct>())
+            getSpinnerRecyclerView().layoutManager = LinearLayoutManager(context)
+//            selectItemByIndex(0) // select a default item.
+            lifecycleOwner = this@CreateSellActivity
         }
-        binding.chooseProduct.adapter = prodAdapter
 
+        binding.chooseBatch.apply {
+            setSpinnerAdapter(batchAdapter)
+            setItems(mutableListOf<Batch>())
+            getSpinnerRecyclerView().layoutManager = LinearLayoutManager(context)
+//            selectItemByIndex(0) // select a default item.
+            lifecycleOwner = this@CreateSellActivity
+        }
+        
         lifecycleScope.launch(handler) {
             loadingDialog.show(supportFragmentManager, "loading")
             val job1 =
@@ -192,12 +141,15 @@ class CreateSellActivity : AppCompatActivity() {
                         Toast.LENGTH_SHORT
                     ).show()
                 } else {
-                    retAdapter.clear()
-                    retAdapter.addAll(res1.body()!!.map { it.user }.toMutableList())
+                    binding.chooseRet.setItems(res1.body()!!.map { it.user }.toMutableList())
 
                     if (res2.isSuccessful && res2.body() != null){
-                        prodAdapter.clear()
-                        prodAdapter.addAll(res2.body()!!)
+                        when(res2.body()!!.size){
+                            in 1..4 -> binding.chooseProduct.spinnerPopupHeight = 500
+                            in 5..10 -> binding.chooseProduct.spinnerPopupHeight = 700
+                            else -> binding.chooseProduct.spinnerPopupHeight = 1000
+                        }
+                        prodAdapter.setItems(res2.body()!!)
                         updateUi()
                     }else{
                         Toast.makeText(
@@ -222,116 +174,31 @@ class CreateSellActivity : AppCompatActivity() {
     private fun updateUi() {
 
 
+        binding.chooseProduct.setOnSpinnerItemSelectedListener<RetailerProduct> { oldIndex, oldItem, newIndex, newItem ->
+            binding.chooseBatch.setItems(newItem.batches)
+            binding.productDetails.isVisible = false
+            binding.chooseBatch.selectItemByIndex(0)
 
-        val batchAdapter = object : ArrayAdapter<Batch>(
-            this@CreateSellActivity, android.R.layout.simple_dropdown_item_1line,
-            mutableListOf()
-        ) {
-            override fun getView(
-                position: Int,
-                convertView: View?,
-                parent: ViewGroup
-            ): View {
-                return initGetView(position, convertView, parent)
-            }
-
-            override fun getDropDownView(
-                position: Int,
-                convertView: View?,
-                parent: ViewGroup
-            ): View {
-                return initDropDownView(position, convertView, parent)
-            }
-
-            private fun initGetView(
-                position: Int,
-                convertView: View?,
-                parent: ViewGroup
-            ):View{
-                val textView = TextView(this@CreateSellActivity)
-                val c = getItem(position)!!
-                textView.text = getItem(position)!!.batchNo
-                textView.updatePadding(20,20,20,20)
-                return textView
-            }
-
-            private fun initDropDownView(
-                position: Int,
-                convertView: View?,
-                parent: ViewGroup
-            ): View {
-                val binding = ItemBatchBinding.inflate(
-                    LayoutInflater.from(parent.context),
-                    parent,
-                    false
-                )
-                with(binding) {
-                    val c = getItem(position)!!
-                    productName.text = c.productName
-                    quantity.text = "Quantity: ${c.quantity}"
-                    mrp.text = "MRP: ₹${c.MRP}"
-                    sellPrice.text = "Sell Price: ₹${c.sellingPrice}"
-                    batchNo.text = "Batch No: ${c.batchNo}"
-                }
-                return binding.root
-            }
-        }
-        binding.chooseBatch.adapter = batchAdapter
-
-        binding.chooseProduct.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                if(!prodAdapter.isEmpty) {
-                    batchAdapter.clear()
-                    batchAdapter.addAll((binding.chooseProduct.selectedItem as RetailerProduct).batches)
-                }
-                binding.productDetails.isVisible = false
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-            }
-        }
-        binding.chooseRet.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-                binding.productDetails.isVisible = false
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-
-            }
-        }
-        binding.chooseBatch.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
-            ) {
-
-                binding.TextFieldQuantity.isErrorEnabled = false
-                binding.productDetails.isVisible = true
-                with(binding) {
-                    val c = (binding.chooseProduct.selectedItem as RetailerProduct).batches[position]
-                    productName.text = c.productName
-                    quantity.text = "Quantity: ${c.quantity}"
-                    mrp.text = "MRP: ₹${c.MRP}"
-                    batchNo.text = "Batch No: ${c.batchNo}"
-                }
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-            }
         }
 
+        binding.chooseRet.setOnSpinnerItemSelectedListener<Retailer> {
+                oldIndex, oldItem, newIndex, newItem ->
+
+        binding.productDetails.isVisible = false
+            }
+
+        binding.chooseBatch.setOnSpinnerItemSelectedListener<Batch> { oldIndex, oldItem, newIndex, newItem ->
+
+            binding.TextFieldQuantity.isErrorEnabled = false
+            binding.productDetails.isVisible = true
+            with(binding) {
+                val c = newItem
+                productName.text = c.productName
+                quantity.text = "Quantity: ${c.quantity}"
+                mrp.text = "MRP: ₹${c.MRP}"
+                batchNo.text = "Batch No: ${c.batchNo}"
+            }
+        }
 
         var orderBatchAdapter: BatchAdapter? = null
         orderBatchAdapter = BatchAdapter {
@@ -349,7 +216,7 @@ class CreateSellActivity : AppCompatActivity() {
                 binding.TextFieldQuantity.error = "Quantity required"
                 binding.TextFieldQuantity.isErrorEnabled = true
             } else if (binding.editTextQuantity.text.toString()
-                    .toInt() > (binding.chooseBatch.selectedItem as Batch).quantity
+                    .toInt() > batchAdapter.spinnerItems[binding.chooseBatch.selectedIndex].quantity
             ) {
                 Toast.makeText(
                     this,
@@ -358,11 +225,25 @@ class CreateSellActivity : AppCompatActivity() {
                 ).show()
             } else {
                 val nl= mutableListOf<Batch>()
-                nl.addAll(orderBatchAdapter.currentList)
-                nl.add(binding.chooseBatch.selectedItem as Batch)
-                orderBatchAdapter.submitList(nl)
+                nl.addAll(orderBatchAdapter!!.currentList)
+                val item = batchAdapter.spinnerItems[binding.chooseBatch.selectedIndex]
+                val batch = item.copy(
+                    id = item.id,
+                    batchNo = item.batchNo,
+                    MRP = item.MRP,
+                    mfg = item.mfg,
+                    expiry = item.expiry,
+                    productName = item.productName,
+                    quantity = binding.editTextQuantity.text.toString().toInt(),
+                    buyingPrice = item.buyingPrice,
+                    sellingPrice = item.sellingPrice,
+                    isUpdateAllowed = item.isUpdateAllowed
+                )
+                nl.add(batch)
+                orderBatchAdapter?.submitList(nl)
             }
         }
+        
         binding.createOrder.setOnClickListener {
 
             when(role){
@@ -385,13 +266,12 @@ class CreateSellActivity : AppCompatActivity() {
                             val order = JSONObject()
                             order.put(
                                 "toRetailerId",
-                                (binding.chooseRet.selectedItem as Retailer).id.toHexString()
+                                retAdapter.spinnerItems[binding.chooseRet.selectedIndex].id.toHexString()
                             )
                             order.put(
                                 "totalPrice",
-                                orderBatchAdapter.currentList.sumOf { it.sellingPrice })
+                                orderBatchAdapter.currentList.sumOf { it.quantity * it.sellingPrice })
 
-                            //TODO Paid
                             order.put(
                                 "paid",
                                 binding.editTextPaid.text.toString().toInt())
@@ -465,7 +345,7 @@ class CreateSellActivity : AppCompatActivity() {
                             )
                             order.put(
                                 "totalPrice",
-                                orderBatchAdapter.currentList.sumOf { it.sellingPrice })
+                                orderBatchAdapter.currentList.sumOf {it.quantity * it.sellingPrice })
 
                             //TODO Paid
                             order.put(
