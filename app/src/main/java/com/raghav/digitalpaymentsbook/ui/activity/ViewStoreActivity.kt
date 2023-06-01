@@ -26,6 +26,7 @@ import com.raghav.digitalpaymentsbook.databinding.ActivityStoreBinding
 import com.raghav.digitalpaymentsbook.databinding.DialogDownloadSheetBinding
 import com.raghav.digitalpaymentsbook.ui.dialog.LoadingDialog
 import com.raghav.digitalpaymentsbook.ui.fragment.BatchsDetailContainerFragment
+import com.raghav.digitalpaymentsbook.util.Constants
 import com.raghav.digitalpaymentsbook.util.PreferenceManager
 import com.raghav.digitalpaymentsbook.util.getAuthToken
 import kotlinx.coroutines.async
@@ -209,7 +210,6 @@ class ViewStoreActivity : AppCompatActivity() {
 
             val jsonArray = JSONArray()
 
-            Log.d("TAG","ROWS= ${sheet.physicalNumberOfRows}")
             for (i in 1 until sheet.physicalNumberOfRows) {
                 val currentRow: Row = sheet.getRow(i)
                 val jsonObject = JSONObject()
@@ -276,7 +276,7 @@ class ViewStoreActivity : AppCompatActivity() {
 
         binding.accept.setOnClickListener {
             val downloader = AndroidDownloader(this)
-            downloader.downloadFile("https://1f27-157-38-60-9.ngrok-free.app/api/v1/retailer/sample_sheet",PreferenceManager.getInstance(this).getAuthToken())
+            downloader.downloadFile("${Constants.BASE_URL}retailer/sample_sheet",PreferenceManager.getInstance(this).getAuthToken())
             Toast.makeText(this, "File download started..", Toast.LENGTH_SHORT).show()
             alertDialog?.dismiss()
         }

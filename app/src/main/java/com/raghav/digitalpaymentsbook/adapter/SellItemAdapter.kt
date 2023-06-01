@@ -69,6 +69,14 @@ class SellItemAdapter (private val onItemClickListener: (retailer: SellItem)->Un
                 }
                 batchCount.text = "Batch(s): ${c.batches.size}"
             }
+            if(c.fromRetailer!=null){
+                retailerName.text = c.fromRetailer.name
+                businessName.text = c.fromRetailer.businessName
+                avatarText.text = if (c.fromRetailer.businessName.contains(" "))
+                    "${c.fromRetailer.businessName.split(" ")[0][0]}${c.fromRetailer.businessName.split(" ")[1][0]}"
+                else
+                    c.fromRetailer.businessName[0].toString()
+            }
 
 
             date.text = SimpleDateFormat("dd/MM/yyyy").format(c.date)

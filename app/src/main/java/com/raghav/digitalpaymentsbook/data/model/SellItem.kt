@@ -11,6 +11,7 @@ data class SellItem(
     @SerializedName("_id")
     val id: ObjectId,
     val toRetailer: Retailer?,
+    val fromRetailer: Retailer?,
     val customerName: String?,
     val customerEmail: String?,
     val isCustomerSale: Boolean,

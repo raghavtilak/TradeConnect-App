@@ -2,6 +2,7 @@ package com.raghav.digitalpaymentsbook.data.network
 
 import android.content.Context
 import android.util.Log
+import com.raghav.digitalpaymentsbook.util.Constants
 import com.raghav.digitalpaymentsbook.util.GsonUtils
 import com.raghav.digitalpaymentsbook.util.SingletonHolder
 import com.raghav.digitalpaymentsbook.util.UnsafeOkHttpClient
@@ -12,7 +13,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 //Client
 class RetrofitHelper {
 
-    val BASE_URL = "http://192.168.170.47:5000/api/v1/";
 
 //    private fun retrofitService(): Retrofit {
 //        return Retrofit.Builder()
@@ -24,7 +24,7 @@ class RetrofitHelper {
 
     companion object : SingletonHolder<UserAPI,Context>({
         Retrofit.Builder()
-            .baseUrl("https://e278-2409-4052-68c-3d0d-3001-edb-da05-8d19.ngrok-free.app/api/v1/")
+            .baseUrl(Constants.BASE_URL)
             .client(UnsafeOkHttpClient(it).getUnsafeOkHttpClient())
             .addConverterFactory(GsonConverterFactory.create(GsonUtils.gson))
             .build().create(UserAPI::class.java)
