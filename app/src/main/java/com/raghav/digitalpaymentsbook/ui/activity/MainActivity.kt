@@ -19,6 +19,7 @@ import com.raghav.digitalpaymentsbook.adapter.RetailerAdapter
 import com.raghav.digitalpaymentsbook.data.model.enums.UserRole
 import com.raghav.digitalpaymentsbook.data.network.RetrofitHelper
 import com.raghav.digitalpaymentsbook.databinding.ActivityMainBinding
+import com.raghav.digitalpaymentsbook.ui.dialog.LoadingDialog
 import com.raghav.digitalpaymentsbook.ui.viewmodel.MainViewmodel
 import com.raghav.digitalpaymentsbook.util.*
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -146,6 +147,8 @@ class MainActivity : AppCompatActivity() {
         binding.recyclerView.adapter = adapter
 
         binding.swipeRefresh.setOnRefreshListener {
+            val loadingDialog = LoadingDialog()
+            loadingDialog.show(supportFragmentManager,"loading")
             lifecycleScope.launch(handler) {
 
                 val result =
@@ -155,9 +158,11 @@ class MainActivity : AppCompatActivity() {
                     val list = result.body()!!
                     adapter.submitList(list)
                     Log.d("TAG", "custo her ${result.body()}")
+                    loadingDialog.dismiss()
                 } else {
                     Toast.makeText(this@MainActivity, "Couldn't load retailers", Toast.LENGTH_SHORT)
                         .show()
+                    loadingDialog.dismiss()
                     Log.d("TAG", "custo her ${result.body()}")
                 }
             }
