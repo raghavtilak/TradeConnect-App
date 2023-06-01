@@ -34,31 +34,23 @@ class PushNotificationService : FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         val title = message.notification!!.title
         val text = message.notification!!.body
-        var link: String? = null
-        if (message.data.isNotEmpty() && message.data.containsKey("link")) {
-            link = message.data["link"]
-            createNotification(title, text, link,"link")
-        }else if(message.data.isNotEmpty() && message.data.containsKey("order")){
-            createNotification(title, text, link,"order")
-        }else if(message.data.isNotEmpty() && message.data.containsKey("connection")){
-            createNotification(title, text, link,"connection")
+        if(text!!.isNotEmpty() && text.contains("order")){
+            createNotification(title, text,"order")
+        }else if(text.isNotEmpty() && text.contains("connection")){
+            createNotification(title, text,"connection")
         }else{
-            createNotification(title, text, link,"none")
+            createNotification(title, text,"none")
         }
         super.onMessageReceived(message)
     }
 
-    private fun createNotification(title: String?, text: String?, link: String?,type: String) {
+    private fun createNotification(title: String?, text: String?,type: String) {
 
         // Create an Intent for the activity you want to start
 //        Intent resultIntent = new Intent(this, MainActivity.class);
         val resultIntent: Intent
 
         when (type) {
-            "link" -> {
-                resultIntent = Intent(Intent.ACTION_VIEW)
-                resultIntent.data = Uri.parse(link)
-            }
             "order" -> {
                 resultIntent = Intent(this, PendingOrdersActivity::class.java)
             }
