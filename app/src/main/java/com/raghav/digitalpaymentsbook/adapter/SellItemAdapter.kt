@@ -43,8 +43,8 @@ class SellItemAdapter (private val onItemClickListener: (retailer: SellItem)->Un
             else
                 icon.setImageDrawable(holder.parent.context.getDrawable(R.drawable.ic_baseline_arrow_inward_24))
 
-            retailerName.setSelected(true)
-            businessName.setSelected(true)
+            retailerName.isSelected = true
+            businessName.isSelected = true
 
             if(!c.isCustomerSale && c.toRetailer!=null){
                 retailerName.text = c.toRetailer.name

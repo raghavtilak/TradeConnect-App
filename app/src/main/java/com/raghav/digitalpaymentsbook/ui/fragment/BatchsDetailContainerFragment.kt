@@ -123,7 +123,7 @@ class BatchsDetailContainerFragment(val showUpdateOption:Boolean, val sellItem:S
                             async { RetrofitHelper.getInstance(requireActivity()).updateSell(sellItem.id,body) }
                         val response = job.await()
                         if (response.isSuccessful && response.body() != null) {
-                            Toast.makeText(requireActivity(), response.body()!!.error, Toast.LENGTH_SHORT).show()
+                            Toast.makeText(requireActivity(), response.body()!!.message, Toast.LENGTH_SHORT).show()
                             alertDialog?.dismiss()
                             loadingDialog.dismiss()
                         } else {

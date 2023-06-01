@@ -209,6 +209,7 @@ class ViewStoreActivity : AppCompatActivity() {
 
             val jsonArray = JSONArray()
 
+            Log.d("TAG","ROWS= ${sheet.physicalNumberOfRows}")
             for (i in 1 until sheet.physicalNumberOfRows) {
                 val currentRow: Row = sheet.getRow(i)
                 val jsonObject = JSONObject()
